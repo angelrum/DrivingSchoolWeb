@@ -1,11 +1,13 @@
 import Vue from 'vue'
 import App from './App.vue'
+import Vuetify from "vuetify";
 import './registerServiceWorker'
 import router from './router'
 import store from './store'
-import 'materialize-css/dist/js/materialize.min'
+import 'vuetify/dist/vuetify.min.css'
 
 Vue.config.productionTip = false
+Vue.use(Vuetify)
 
 new Vue({
   router,
