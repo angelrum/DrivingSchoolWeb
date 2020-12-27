@@ -1,5 +1,5 @@
 <template>
-  <div class="wrapper">
+  <div data-app class="wrapper v-application">
     <Sidebar :is-open="isOpen"/>
     <div class="main">
       <Navbar @menubar="isOpen=!isOpen"/>

@@ -16,7 +16,7 @@
           <div class="card-body">
             <v-form>
               <v-row>
-                <v-col class="col-3">
+                <v-col class="col-3 m-auto">
                   <v-img
                       src="https://img.icons8.com/bubbles/100/000000/elvis-presley.png"
                       max-height="100"
@@ -36,14 +36,14 @@
                     <v-col>
                       <v-text-field
                           :counter="10"
-                          label="Фамилия"
+                          label="Имя"
                           required>
                       </v-text-field>
                     </v-col>
                     <v-col>
                       <v-text-field
                           :counter="10"
-                          label="Фамилия"
+                          label="Отчество"
                           required>
                       </v-text-field>
                     </v-col>
@@ -51,53 +51,36 @@
                   <v-row>
                     <v-col>
                       <v-text-field
-                          :counter="10"
-                          label="Фамилия"
+                          label="Email"
                           required>
                       </v-text-field>
+                    </v-col>
+                    <v-col class="m-auto col-sm-auto">
+                      <v-chip color="green" text-color="white">Подтвержден</v-chip>
                     </v-col>
                     <v-col>
                       <v-text-field
                           :counter="10"
-                          label="Фамилия"
+                          label="Номер телефона"
+                          type=""
                           required>
                       </v-text-field>
                     </v-col>
+                    <v-col class="m-auto col-sm-auto">
+                      <v-chip class="ma-2" text-color="white">В процессе</v-chip>
+                    </v-col>
                     <v-col>
-                      <v-text-field
-                          :counter="10"
-                          label="Фамилия"
-                          required>
-                      </v-text-field>
+                      <v-select :items="items" label="Статус"></v-select>
                     </v-col>
                   </v-row>
                 </v-col>
               </v-row>
-              <v-row>
-                <v-col>
-                  <div class="input-group mb-3">
-                    <div class="input-group-prepend v-text-field pb-21">
-                      <span class="input-group-text">$</span>
-                    </div>
-                    <v-text-field
-                        label="Имя"
-                        required>
-                    </v-text-field>
-                  </div>
+              <v-row class="justify-content-end">
+                <v-col class="col-sm-auto">
+                  <v-btn depressed color="error">Отменить</v-btn>
                 </v-col>
-                <v-col>
-                  <v-text-field
-                      :counter="10"
-                      label="Имя"
-                      required>
-                  </v-text-field>
-                </v-col>
-                <v-col>
-                  <v-text-field
-                      :counter="10"
-                      label="Отчество"
-                      required>
-                  </v-text-field>
+                <v-col class="col-sm-auto">
+                  <v-btn depressed color="primary">Сохранить</v-btn>
                 </v-col>
               </v-row>
             </v-form>
@@ -110,7 +93,11 @@
 
 <script>
 export default {
-name: "Student"
+  name: "Student",
+  data: ()=>({
+    items: ['PENDING', 'ENABLED', 'DISABLED'],
+    edit: false
+  })
 }
 </script>
 
