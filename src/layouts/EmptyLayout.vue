@@ -1,13 +1,13 @@
 <template>
-  <div class="home">
 
-  </div>
 </template>
 
 <script>
-
-
 export default {
-  name: 'Home'
+name: "EmptyLayout"
 }
 </script>
+
+<style scoped>
+
+</style>
