@@ -76,11 +76,14 @@
                 </v-col>
               </v-row>
               <v-row class="justify-content-end">
-                <v-col class="col-sm-auto">
-                  <v-btn depressed color="error">Отменить</v-btn>
+                <v-col class="col-sm-auto" :class="{'d-none':edit}">
+                  <v-btn depressed color="error" @click.prevent="clearProfile">Отменить</v-btn>
                 </v-col>
-                <v-col class="col-sm-auto">
+                <v-col class="col-sm-auto" :class="{'d-none':edit}">
                   <v-btn depressed color="primary">Сохранить</v-btn>
+                </v-col>
+                <v-col class="col-sm-auto" :class="{'d-none':!edit}">
+                  <v-btn depressed color="primary" @click.prevent="edit=!edit">Изменить</v-btn>
                 </v-col>
               </v-row>
             </v-form>
@@ -96,8 +99,19 @@ export default {
   name: "Student",
   data: ()=>({
     items: ['PENDING', 'ENABLED', 'DISABLED'],
-    edit: false
-  })
+    edit: true
+  }),
+  methods: {
+    saveProfile() {
+
+    },
+    clearProfile() {
+      this.edit = !this.edit
+    }
+  },
+  mounted() {
+
+  }
 }
 </script>
 
