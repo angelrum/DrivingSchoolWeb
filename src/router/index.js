@@ -14,7 +14,7 @@ const routes = [
     path: '/profile',
     name: 'profile',
     meta: {layout: 'main'},
-    component: () => import('@/views/profile/Student')
+    component: () => import('@/views/profile/Profile')
   }
 ]
 
