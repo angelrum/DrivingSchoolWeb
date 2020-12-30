@@ -17,7 +17,7 @@
                 :clearable="edit"
                 v-model="user.lastname"
                 :counter="edit ? 30: null"
-                label="Фамилия"
+                :label="$t('lastname')"
                 :rules="[rules.required]"
                 required>
             </v-text-field>
@@ -28,7 +28,7 @@
                 :clearable="edit"
                 v-model="user.firstname"
                 :counter="edit ? 30: null"
-                label="Имя"
+                :label="$t('firstname')"
                 :rules="[rules.required]"
                 required>
             </v-text-field>
@@ -39,7 +39,7 @@
                 :clearable="edit"
                 v-model="user.middlename"
                 :counter="edit ? 30: null"
-                label="Отчество"
+                :label="$t('middlename')"
                 required>
             </v-text-field>
           </v-col>
@@ -51,7 +51,7 @@
                 :clearable="edit"
                 v-model="user.email"
                 :counter="edit ? 30: null"
-                label="Email"
+                :label="$t('email')"
                 :append-icon="user.emailStatus ? 'fa-check-circle green--text':'fa-question-circle orange--text'"
                 :color="user.emailStatus ? 'green' : 'orange'"
                 :rules="[rules.email]"
@@ -64,7 +64,7 @@
                 :clearable="edit"
                 v-model="user.phone"
                 :counter="edit ? 16: null"
-                label="Номер телефона"
+                :label="$t('phone')"
                 :rules="[rules.phone]"
                 :append-icon="user.phoneStatus ? 'fa-check-circle green--text':'fa-question-circle orange--text'"
                 :color="user.phoneStatus ? 'green' : 'orange'"
@@ -79,8 +79,8 @@
                 @click:append="show = !show"
                 v-model="user.password"
                 :counter="edit ? 20: null"
-                label="Пароль"
-                :rules="[rules.required]"
+                :label="$t('password')"
+                :rules="[rules.required, rules.min]"
                 required>
             </v-text-field>
           </v-col>
@@ -90,22 +90,22 @@
     <div v-if="isEdit">
       <v-row v-if="edit" class="justify-content-end">
         <v-col class="col-sm-auto" >
-          <button class="btn btn-pill btn-danger" @click.prevent="clearProfile">Отменить</button>
+          <button class="btn btn-pill btn-danger" @click.prevent="clearProfile">{{ $t('cancel') }}</button>
         </v-col>
         <v-col class="col-sm-auto">
-          <button class="btn btn-pill btn-success">Сохранить</button>
+          <button class="btn btn-pill btn-success">{{ $t('save') }}</button>
         </v-col>
       </v-row>
       <v-row v-else-if="!edit" class="justify-content-end">
         <v-col class="col-sm-auto">
-          <button class="btn btn-pill btn-primary" @click.prevent="edit=!edit">Изменить</button>
+          <button class="btn btn-pill btn-primary" @click.prevent="edit=!edit">{{ $t('edit') }}</button>
         </v-col>
       </v-row>
     </div>
   </v-form>
 </template>
-
 <script>
+
 export default {
   name: "User",
   props: ['isEdit'], //можно ли редактировать форму
@@ -128,6 +128,7 @@ export default {
     },
     rules: {
       required: value => !!value || 'Не должно быть пустым',
+      min: value => value.length >= 3 || 'Не менее 3 символов',
       email: value => {
         if (!value) return true
         const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
@@ -149,7 +150,11 @@ export default {
     }
   },
   async mounted() {
-    this.user = await this.$store.dispatch('fetchUserById', 1000)
+    try {
+      this.user = await this.$store.dispatch('fetchUserById', 1000)
+    } catch (e) {
+
+    }
   }
 }
 </script>

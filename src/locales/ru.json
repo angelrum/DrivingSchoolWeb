@@ -1,0 +1,11 @@
+{
+  "firstname": "Имя",
+  "lastname": "Фамилия",
+  "middlename": "Отчество",
+  "email": "Email",
+  "phone": "Номер телефона",
+  "password": "Пароль",
+  "edit": "Изменить",
+  "cancel": "Отменить",
+  "save": "Сохранить"
+}
