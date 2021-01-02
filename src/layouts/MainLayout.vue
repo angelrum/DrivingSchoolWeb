@@ -21,6 +21,24 @@ export default {
   data: () => ({
     isOpen: true
   }),
+  computed: {
+    error() { //
+      return this.$store.getters.error
+    },
+    success() {
+      return this.$store.getters.success
+    }
+  },
+  watch: {
+    error(error) {
+      debugger
+      let text = (typeof(error.response) !== "undefined") ? this.$t(error.response.statusText) : this.$t(error)
+      this.$noty.error(text)
+    },
+    success(html) {
+      this.$noty.success(this.$t('update.success'))
+    }
+  },
   components: {
     Navbar, Sidebar
   }

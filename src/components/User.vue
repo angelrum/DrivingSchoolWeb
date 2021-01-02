@@ -1,19 +1,24 @@
 <template>
-  <v-form>
+  <v-form ref="userForm" lazy-validation>
     <v-row>
-      <v-col class="col-3 m-auto">
-        <v-img
-            :src="user.avatar"
-            max-height="100"
-            max-width="100"
-            class="m-auto"
-        ></v-img>
+      <v-col class="col-3 text-center">
+        <v-avatar width="100" height="100">
+          <img :src="user.avatar"
+               :alt="user.lastname + '_' + user.firstname"/>
+        </v-avatar>
+<!--        <v-img-->
+<!--            :src="user.avatar"-->
+<!--            max-height="100"-->
+<!--            max-width="100"-->
+<!--            class="m-auto"-->
+<!--        ></v-img>-->
       </v-col>
       <v-col>
         <v-row>
           <v-col>
             <v-text-field
                 :readonly="!edit"
+                :disabled="!edit"
                 :clearable="edit"
                 v-model="user.lastname"
                 :counter="edit ? 30: null"
@@ -25,6 +30,7 @@
           <v-col>
             <v-text-field
                 :readonly="!edit"
+                :disabled="!edit"
                 :clearable="edit"
                 v-model="user.firstname"
                 :counter="edit ? 30: null"
@@ -36,6 +42,7 @@
           <v-col>
             <v-text-field
                 :readonly="!edit"
+                :disabled="!edit"
                 :clearable="edit"
                 v-model="user.middlename"
                 :counter="edit ? 30: null"
@@ -48,6 +55,7 @@
           <v-col>
             <v-text-field
                 :readonly="!edit"
+                :disabled="!edit"
                 :clearable="edit"
                 v-model="user.email"
                 :counter="edit ? 30: null"
@@ -61,13 +69,15 @@
           <v-col>
             <v-text-field
                 :readonly="!edit"
+                :disabled="!edit"
                 :clearable="edit"
-                v-model="user.phone"
+                :value="user.phone"
                 :counter="edit ? 16: null"
                 :label="$t('phone')"
                 :rules="[rules.phone]"
                 :append-icon="user.phoneStatus ? 'fa-check-circle green--text':'fa-question-circle orange--text'"
                 :color="user.phoneStatus ? 'green' : 'orange'"
+                @keypress="checkInputKey"
                 required>
             </v-text-field>
           </v-col>
@@ -76,6 +86,7 @@
                 :append-icon="!show ? 'mdi-eye' : 'mdi-eye-off'"
                 :type="!show ? 'text': 'password'"
                 :readonly="!edit"
+                :disabled="!edit"
                 @click:append="show = !show"
                 v-model="user.password"
                 :counter="edit ? 20: null"
@@ -90,10 +101,10 @@
     <div v-if="isEdit">
       <v-row v-if="edit" class="justify-content-end">
         <v-col class="col-sm-auto" >
-          <button class="btn btn-pill btn-danger" @click.prevent="clearProfile">{{ $t('cancel') }}</button>
+          <button class="btn btn-pill btn-danger" @click.prevent="$emit('updateUser')">{{ $t('cancel') }}</button>
         </v-col>
         <v-col class="col-sm-auto">
-          <button class="btn btn-pill btn-success">{{ $t('save') }}</button>
+          <button class="btn btn-pill btn-success" @click.prevent="saveProfile">{{ $t('save') }}</button>
         </v-col>
       </v-row>
       <v-row v-else-if="!edit" class="justify-content-end">
@@ -108,24 +119,17 @@
 
 export default {
   name: "User",
-  props: ['isEdit'], //можно ли редактировать форму
+  props: {
+    isEdit: Boolean,
+    inputUser: {
+      type: Object,
+      required: true
+    }
+  },
   data: ()=>({
+    count: 0,
     edit: false,
     show: true,
-    user: {
-      id: null,
-      active: true,
-      avatar: 'https://img.icons8.com/bubbles/100/000000/elvis-presley.png',
-      firstname: '',
-      lastname: '',
-      middlename: '',
-      email: '',
-      emailStatus: false,
-      phone: '',
-      phoneStatus: false,
-      password:'',
-      score: 0
-    },
     rules: {
       required: value => !!value || 'Не должно быть пустым',
       min: value => value.length >= 3 || 'Не менее 3 символов',
@@ -140,21 +144,80 @@ export default {
       }
     }
   }),
-  methods: {
-    saveProfile() {
+  computed: {
+    user: {
+      get: function () {
+        return (typeof this.inputUser !== "undefined")
+                ? Object.assign({}, this.inputUser) : null
+      },
+      set: function (value) {
+        this.$store.commit("saveUser", value)
+      }
+    }
+  },
 
+  // computed: {
+  //   user: {
+  //     get: function () {
+  //       return this.inputUser
+  //     },
+  //     set: function (value) {
+  //       this.user.id = value.id
+  //       this.user.active = value.active
+  //       this.user.avatar = value.avatar
+  //       this.user.firstname = value.firstname
+  //       this.user.lastname = value.lastname
+  //       this.user.middlename = value.middlename
+  //       this.user.email = value.email
+  //       this.user.emailStatus = value.emailStatus
+  //       this.user.phone = value.phone
+  //       this.user.phoneStatus = value.phoneStatus
+  //       this.user.password = value.password
+  //       this.user.score = value.score
+  //     }
+  //   }
+  // },
+  methods: {
+    async saveProfile() {
+      if (this.$refs.userForm.validate()) {
+        await this.$store.dispatch('updateUser', this.user)
+        await this.clearProfile()
+      } else {
+        this.$store.commit('setError', 'update.validation')
+      }
     },
     async clearProfile() {
       this.edit = !this.edit
-      this.user = await this.$store.dispatch('fetchUserById', 1000)
+      const u = await this.$store.dispatch('fetchUserById', 1000)
+      delete u.schools
+      this.user = Object.assign({}, u)
+    },
+    checkInputKey(event) {
+      const key = event.key
+      debugger
+      if (/\d/.test(key)) {
+        return event
+      } else {
+        event.preventDefault()
+      }
+    },
+    checkInputValue(event) {
+      debugger
+      console.log(event)
+      const copy = Object.assign({}, this.user)
+      copy.phone = '';
+      this.user = copy
+    },
+    updateStyle() {
+      document.querySelectorAll('.v-icon.v-icon--disabled')
+          .forEach(el => el.classList.remove('v-icon--disabled'))
     }
   },
-  async mounted() {
-    try {
-      this.user = await this.$store.dispatch('fetchUserById', 1000)
-    } catch (e) {
-
-    }
+  mounted() {
+    this.updateStyle()
+  },
+  updated() {
+    this.updateStyle()
   }
 }
 </script>

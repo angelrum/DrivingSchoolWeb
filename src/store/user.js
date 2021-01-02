@@ -1,5 +1,4 @@
 import axios from "axios";
-import Vue from 'vue'
 const userUrl = 'http://localhost:8080/users/'
 
 export default {
@@ -9,9 +8,23 @@ export default {
                 const response = await axios.get(userUrl + id)
                 return response.data
             } catch (e) {
-                Vue.prototype.$noty.error("Ошибка при получении данных")
+                commit('setError', e)
                 throw e
             }
+        },
+        async updateUser({commit, dispatch}, user) {
+            try {
+                await axios.put(userUrl, user)
+                commit('setSuccess', 'update.success')
+            } catch (e) {
+                commit('setError', e)
+                throw e
+            }
+        }
+    },
+    mutations: {
+        saveUser(state, user) {
+            state.user = user
         }
     }
 }

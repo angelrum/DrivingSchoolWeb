@@ -22,5 +22,6 @@ import MainLayout from "@/layouts/MainLayout";
 </script>
 <style>
   @import "assets/light.css";
+  @import "assets/custom.css";
   /*@import "~materialize-css/dist/css/materialize.min.css";*/
 </style>
