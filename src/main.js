@@ -17,6 +17,10 @@ Vue.use(VueNoty, {
   progressBar: true,
   layout: 'bottomRight'
 })
+// Vue.directive('icon', { update (el) {
+//     el.querySelectorAll('.v-icon.v-icon--disabled')
+//         .forEach(el => el.classList.remove('v-icon--disabled')) }
+// })
 
 new Vue({
   router,

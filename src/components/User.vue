@@ -71,13 +71,13 @@
                 :readonly="!edit"
                 :disabled="!edit"
                 :clearable="edit"
-                :value="user.phone"
-                :counter="edit ? 16: null"
+                v-model="user.phone"
+                :counter="edit ? 17: null"
                 :label="$t('phone')"
                 :rules="[rules.phone]"
                 :append-icon="user.phoneStatus ? 'fa-check-circle green--text':'fa-question-circle orange--text'"
                 :color="user.phoneStatus ? 'green' : 'orange'"
-                @keypress="checkInputKey"
+                @keydown="checkInputValue"
                 required>
             </v-text-field>
           </v-col>
@@ -126,10 +126,11 @@ export default {
       required: true
     }
   },
-  data: ()=>({
+  data: () => ({
     count: 0,
     edit: false,
     show: true,
+    user: null,
     rules: {
       required: value => !!value || 'Не должно быть пустым',
       min: value => value.length >= 3 || 'Не менее 3 символов',
@@ -144,39 +145,6 @@ export default {
       }
     }
   }),
-  computed: {
-    user: {
-      get: function () {
-        return (typeof this.inputUser !== "undefined")
-                ? Object.assign({}, this.inputUser) : null
-      },
-      set: function (value) {
-        this.$store.commit("saveUser", value)
-      }
-    }
-  },
-
-  // computed: {
-  //   user: {
-  //     get: function () {
-  //       return this.inputUser
-  //     },
-  //     set: function (value) {
-  //       this.user.id = value.id
-  //       this.user.active = value.active
-  //       this.user.avatar = value.avatar
-  //       this.user.firstname = value.firstname
-  //       this.user.lastname = value.lastname
-  //       this.user.middlename = value.middlename
-  //       this.user.email = value.email
-  //       this.user.emailStatus = value.emailStatus
-  //       this.user.phone = value.phone
-  //       this.user.phoneStatus = value.phoneStatus
-  //       this.user.password = value.password
-  //       this.user.score = value.score
-  //     }
-  //   }
-  // },
   methods: {
     async saveProfile() {
       if (this.$refs.userForm.validate()) {
@@ -192,21 +160,31 @@ export default {
       delete u.schools
       this.user = Object.assign({}, u)
     },
-    checkInputKey(event) {
+    checkInputValue(event) {
       const key = event.key
-      debugger
       if (/\d/.test(key)) {
+        let phonenumber = '+7(';
+        if (!Object.is(this.user.phone, null)) {
+          let phone = this.user.phone.replace(phonenumber, '') + key
+          for (let num of phone) {
+            if (/\d/i.test(num) && phonenumber.length < 17) {
+              switch (phonenumber.length) {
+                case 6:phonenumber += ") "; break;
+                case 11:
+                case 14: phonenumber += "-"; break;
+              }
+              phonenumber += num;
+            }
+          }
+          phonenumber = phonenumber.substring(0, phonenumber.length - 1)
+        }
+        this.user.phone = phonenumber
+        return event
+      } else if(Object.is(key, 'Backspace')) {
         return event
       } else {
         event.preventDefault()
       }
-    },
-    checkInputValue(event) {
-      debugger
-      console.log(event)
-      const copy = Object.assign({}, this.user)
-      copy.phone = '';
-      this.user = copy
     },
     updateStyle() {
       document.querySelectorAll('.v-icon.v-icon--disabled')
@@ -215,6 +193,7 @@ export default {
   },
   mounted() {
     this.updateStyle()
+    this.user = Object.assign({}, this.inputUser)
   },
   updated() {
     this.updateStyle()
@@ -223,7 +202,5 @@ export default {
 </script>
 
 <style scoped>
-  .pb-21 {
-    padding-bottom: 21px;
-  }
+
 </style>

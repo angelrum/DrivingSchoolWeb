@@ -31,7 +31,6 @@ export default {
   },
   watch: {
     error(error) {
-      debugger
       let text = (typeof(error.response) !== "undefined") ? this.$t(error.response.statusText) : this.$t(error)
       this.$noty.error(text)
     },
