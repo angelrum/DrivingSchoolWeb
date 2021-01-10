@@ -22,20 +22,17 @@ export default {
     isOpen: true
   }),
   computed: {
-    error() { //
-      return this.$store.getters.error
-    },
-    success() {
-      return this.$store.getters.success
+    info() {
+      return this.$store.getters.info
     }
   },
   watch: {
-    error(error) {
-      let text = (typeof(error.response) !== "undefined") ? this.$t(error.response.statusText) : this.$t(error)
-      this.$noty.error(text)
-    },
-    success(html) {
-      this.$noty.success(this.$t('update.success'))
+    info(info) {
+      let html = ''
+      info.details.forEach(val => { html += Object.is(html, '') ? this.$t(val) : '<br>' + this.$t(val) })
+      this.$noty.hasOwnProperty(info.type)
+          ? this.$noty[info.type](html)
+          : this.$noty.error(html)
     }
   },
   components: {

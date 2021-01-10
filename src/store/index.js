@@ -4,39 +4,32 @@ import user from "@/store/user";
 
 Vue.use(Vuex)
 
+function getDetailsData(response) {
+  let details = [];
+  if (response.status === 404) {
+    details = ["error_404"]
+  } else {
+    response.data.details.forEach(value => details.push(value))
+  }
+  return details;
+}
+
 export default new Vuex.Store({
   state: {
-    error: null,
-    info: null,
-    success: null
+    NotyType: {
+      ERROR: "error",
+      SUCCESS: "success"
+    },
+    information: null
   },
   mutations: {
-    setError(state, i18n) {
-      state.error = i18n
-    },
-    clearError(state) {
-      state.error = null
-    },
-    setInfo(state, i18n) {
-      state.info = i18n
-    },
-    clearInfo(state) {
-      state.info = null
-    },
-    setSuccess(state, i18n) {
-      state.success = i18n
-    },
-    clearSuccess(state, i18n) {
-      state.success = i18n
-    }
+    setError: (state, stack) =>
+        state.information = {type: state.NotyType.ERROR, details: getDetailsData(stack.response)},
+    setSuccess: (state, text) =>
+        state.information = {type: state.NotyType.SUCCESS, details: [text]}
   },
   getters: {
-    error: s => s.error,
-    info: s => s.info,
-    success: s => s.success
-  },
-  actions: {
-
+    info: n => n.information
   },
   modules: {
     user

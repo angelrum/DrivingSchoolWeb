@@ -20,5 +20,16 @@
   "street": "Улица",
   "zip": "Индекс",
   "update.success": "Данные успешно обновлены",
-  "update.validation": "Есть не проверенные данные"
+  "update.validation": "Есть не проверенные данные",
+  "error_404": "Сервер временно недоступен",
+  "validation.notnull": "",
+
+
+  "exception.duplicate.telnumber": "Пользователь с таким номером телефона уже существует",
+  "exception.duplicate.school": "Школа с таким названием уже существует",
+  "exception.duplicate.school.student": "Пользователь уже добавлен к школе",
+
+  "user.firstname.notblank": "\"Имя\" не должно быть пустым",
+  "user.lastname.notblank": "\"Фамилия\" не должно быть пустым",
+  "user.email.email": "\"Email\" не соответствует формату"
 }
