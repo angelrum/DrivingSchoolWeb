@@ -1,6 +1,6 @@
 <template>
   <div data-app class="wrapper v-application">
-    <Sidebar :is-open="isOpen"/>
+    <Sidebar :is-open="isOpen" :auth-user="authUser"/>
     <div class="main">
       <Navbar @menubar="isOpen=!isOpen"/>
       <main class="content">
@@ -19,8 +19,19 @@ import Sidebar from "@/components/app/Sidebar";
 export default {
   name: "MainLayout",
   data: () => ({
-    isOpen: true
+    isOpen: true,
+    authUser: {
+      type: Object
+    }
   }),
+  async created() {
+    this.$store.dispatch('getAuthUser')
+        .then(result => this.authUser = result)
+        .catch(error => {
+          debugger
+          this.$router.push('/login')
+        })
+  },
   computed: {
     info() {
       return this.$store.getters.info

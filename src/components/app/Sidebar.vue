@@ -3,8 +3,14 @@
     <router-link to="/" class="sidebar-brand">Автошкола</router-link>
     <div class="sidebar-content">
       <div class="sidebar-user">
-        <img src="https://img.icons8.com/bubbles/60/000000/user-male.png" class="img-fluid rounded-circle mb-2" alt="Ivanov Ivan">
-        <div class="font-weight-bold">Иванов Иван</div>
+        <v-img
+            :src="avatar"
+            class="img-fluid rounded-circle mb-2 m-auto"
+            :alt="fullname"
+            max-height="100px"
+            max-width="100px"
+            @click="goToProfile"></v-img>
+        <div class="font-weight-bold">{{ fullname }}</div>
         <small>Администратор</small>
       </div>
 
@@ -44,7 +50,37 @@
 <script>
 export default {
   name: "Sidebar",
-  props: ['isOpen']
+  data: () => ({
+    fullname: null,
+    avatar: null
+  }),
+  props: {
+    isOpen: Boolean,
+    authUser: {
+      type: Object
+    }
+  },
+  methods: {
+    goToProfile() {
+      this.$router.push("/profile");
+    }
+  },
+  watch: {
+    authUser: { //https://stackoverflow.com/questions/51292803/watch-props-change-on-vuejs/51292935
+      immediate: true,
+      deep: true,
+      handler (value) {
+        if (!Object.is(value, undefined)
+            && value.hasOwnProperty('lastname')) {
+          this.fullname = [value.lastname, value.firstname].join(' ');
+          this.avatar = value.avatar === '' ? this.$t('anonymous.avatar') : value.avatar;
+        } else {
+          this.fullname = this.$t('anonymous.user');
+          this.avatar = this.$t('anonymous.avatar');
+        }
+      }
+    }
+  }
 }
 </script>
 

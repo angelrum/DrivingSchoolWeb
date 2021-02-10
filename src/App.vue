@@ -17,6 +17,17 @@ import MainLayout from "@/layouts/MainLayout";
    },
    components: {
      EmptyLayout, MainLayout
+   },
+   //если получили ответ от сервера 401 Unautorized, то заворачиваем на logout
+   created() {
+     this.$http.interceptors.response.use(undefined, function (err) {
+       return new Promise(((resolve, reject) => {
+         if (err.status === 401 && err.config && !err.config.__isRetryRequest) {
+           this.$store.dispatch('logout')
+         }
+         throw err;
+       }))
+     })
    }
  }
 </script>

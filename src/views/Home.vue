@@ -8,6 +8,7 @@
 
 
 export default {
-  name: 'Home'
+  name: 'Home',
+  props: ['authUser']
 }
 </script>

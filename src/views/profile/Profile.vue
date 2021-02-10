@@ -57,26 +57,22 @@ export default {
     loadingSchools: true
   }),
   async mounted() {
-    this.schools = await this.getUserData();
-    this.loadingSchools = false
+    this.schools = this.getUserData();
+    this.loadingSchools = false;
   },
   methods: {
     async getUserData() {
-      this.loadingUser = true
+      this.loadingUser = true;
       let schools
-      try {
-        const user = await this.$store.dispatch('fetchUserById', 1000)
-        schools = Object.assign([], user.schools)
-        delete user.schools
-        this.user = user
-      } catch (e) {
-        //ignore
-      } finally {
-        setTimeout(()=>{
-          this.loadingUser = false
-        }, 500)
-      }
-      return schools
+      await this.$store.dispatch('getAuthUser')
+          .then(async authUser => {
+            const user = await this.$store.dispatch('fetchUserById', authUser.id)
+            this.schools = Object.assign([], user.schools)
+            delete user.schools
+            this.user = user;
+          })
+          .finally(()=> setTimeout(() => this.loadingUser = false, 500))
+      return schools;
     }
   }
 }

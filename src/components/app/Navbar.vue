@@ -24,6 +24,11 @@
             <i class="align-middle fas fa-cog"></i>
           </a>
         </li>
+        <li class="nav-item dropdown ml-lg-2">
+          <a class="nav-link dropdown-toggle position-relative" @click.prevent="logout" data-toggle="dropdown">
+            <i class="align-middle fas fa-sign-out-alt"></i>
+          </a>
+        </li>
       </ul>
     </div>
   </nav>
@@ -31,7 +36,12 @@
 
 <script>
 export default {
-name: "Navbar"
+name: "Navbar",
+  methods: {
+    logout() {
+      this.$store.dispatch('logout').finally(() => this.$router.push("/login"))
+    }
+  }
 }
 </script>
 

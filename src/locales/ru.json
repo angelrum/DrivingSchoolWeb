@@ -23,6 +23,13 @@
   "update.validation": "Есть не проверенные данные",
   "error_404": "Сервер временно недоступен",
   "validation.notnull": "",
+  "sign.in": "Войти",
+  "sign.welcome": "Добро пожаловать",
+  "sign.title": "Войдите или зарегистрируйтесь",
+  "sign.auth.error": "Введен неверный логин или пароль",
+  "sign.auth.success": "Вход выполнен",
+  "anonymous.user": "Анонимный пользователь",
+  "anonymous.avatar": "https://img.icons8.com/bubbles/100/000000/charlie-chaplin.png",
 
 
   "exception.duplicate.telnumber": "Пользователь с таким номером телефона уже существует",
