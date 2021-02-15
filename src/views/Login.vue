@@ -46,10 +46,9 @@
             </v-snackbar>
             <v-row>
               <v-col class="col-sm-auto m-auto">
-                <v-btn
+                <v-btn type="submit"
                     depressed
-                    color="primary"
-                    type="submit">{{$t('sign.in')}}
+                    color="primary">{{$t('sign.in')}}
                 </v-btn>
               </v-col>
             </v-row>
@@ -97,8 +96,11 @@ name: "Login",
         await this.$store.dispatch("login", { username: this.login, password: this.password })
             .then(() => {
               this.success = true;
-              setTimeout(() => { this.$router.push('/') }, 500)})
-            .catch(err => this.error = true);
+              setTimeout(() => { this.$router.push({name: 'home'})}, 500)
+            })
+            .catch(() => {
+              this.error = true;
+            });
       }
     }
   },

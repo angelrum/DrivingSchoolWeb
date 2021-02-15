@@ -10,6 +10,7 @@
   "save": "Сохранить",
   "Not Found": "Данные не найдены",
   "name": "Наименование | Краткое наименование",
+  "website": "Сайт",
   "city": "Город",
   "country": "Страна",
   "building": "Строение",
@@ -30,7 +31,8 @@
   "sign.auth.success": "Вход выполнен",
   "anonymous.user": "Анонимный пользователь",
   "anonymous.avatar": "https://img.icons8.com/bubbles/100/000000/charlie-chaplin.png",
-
+  "address.legal": "Юридический адрес",
+  "address.actual": "Фактический адрес",
 
   "exception.duplicate.telnumber": "Пользователь с таким номером телефона уже существует",
   "exception.duplicate.school": "Школа с таким названием уже существует",

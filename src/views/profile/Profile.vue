@@ -20,6 +20,12 @@
         </div>
       </div>
     </div>
+    <div v-if="!Object.is(company, null)" class="row">
+      <div class="col-md-12">
+        <Loader v-if="loadingSchools"/>
+        <Company :company="company"/>
+      </div>
+    </div>
     <div class="row">
       <div class="col-md-12">
         <Loader v-if="loadingSchools"/>
@@ -32,11 +38,12 @@
 <script>
 import User from "@/components/User";
 import School from "@/components/School";
+import Company from "@/components/Company";
 import Loader from "@/components/app/Loader";
 
 export default {
   name: "Profile",
-  components: {School, User, Loader },
+  components: {Company, School, User, Loader },
   data: () => ({
     user: {
       id: null,
@@ -53,6 +60,7 @@ export default {
       score: 0
     },
     schools: null,
+    company: null,
     loadingUser: true,
     loadingSchools: true
   }),
@@ -63,16 +71,20 @@ export default {
   methods: {
     async getUserData() {
       this.loadingUser = true;
-      let schools
       await this.$store.dispatch('getAuthUser')
           .then(async authUser => {
-            const user = await this.$store.dispatch('fetchUserById', authUser.id)
-            this.schools = Object.assign([], user.schools)
-            delete user.schools
+            const user = await this.$store.dispatch('fetchUserById', authUser.id);
+            if (user.hasOwnProperty('schools')) {
+              this.schools = Object.assign([], user.schools);
+              delete user.schools;
+            }
+            if (user.hasOwnProperty('company')) {
+              this.company = Object.assign([], user.company);
+              delete user.company;
+            }
             this.user = user;
           })
           .finally(()=> setTimeout(() => this.loadingUser = false, 500))
-      return schools;
     }
   }
 }

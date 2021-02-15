@@ -25,8 +25,8 @@
           </a>
         </li>
         <li class="nav-item dropdown ml-lg-2">
-          <a class="nav-link dropdown-toggle position-relative" @click.prevent="logout" data-toggle="dropdown">
-            <i class="align-middle fas fa-sign-out-alt"></i>
+          <a class="nav-link dropdown-toggle position-relative" @click="logout" data-toggle="dropdown">
+            <router-link to="/login"><i class="align-middle fas fa-sign-out-alt"></i></router-link>
           </a>
         </li>
       </ul>
@@ -39,7 +39,7 @@ export default {
 name: "Navbar",
   methods: {
     logout() {
-      this.$store.dispatch('logout').finally(() => this.$router.push("/login"))
+      this.$store.dispatch('logout');
     }
   }
 }

@@ -36,69 +36,16 @@
             </v-text-field>
           </v-col>
         </v-row>
-        <v-row>
-          <v-col>
-            <v-text-field
-                disabled
-                readonly
-                v-model="school.address.city"
-                light
-                :label="$t('city')">
-            </v-text-field>
-          </v-col>
-          <v-col class="col-3">
-            <v-text-field
-                disabled
-                readonly
-                v-model="school.address.street"
-                light
-                :label="$t('street')">
-            </v-text-field>
-          </v-col>
-          <v-col>
-            <v-text-field
-                disabled
-                readonly
-                v-model="school.address.building"
-                light
-                :label="$t('building')">
-            </v-text-field>
-          </v-col>
-          <v-col>
-            <v-text-field
-                disabled
-                readonly
-                v-model="school.address.home"
-                light
-                :label="$t('home')">
-            </v-text-field>
-          </v-col>
-          <v-col>
-            <v-text-field
-                disabled
-                readonly
-                v-model="school.address.floor"
-                light
-                :label="$t('floor')">
-            </v-text-field>
-          </v-col>
-          <v-col>
-            <v-text-field
-                disabled
-                readonly
-                v-model="school.address.office"
-                light
-                :label="$t('office')">
-            </v-text-field>
-          </v-col>
-        </v-row>
+        <Address :address="school.address"/>
       </v-expansion-panel-content>
     </v-expansion-panel>
   </v-expansion-panels>
 </template>
 
 <script>
+import Address from "@/components/Address";
 export default {
+  components: {Address},
   props: ['schools'],
   name: "School",
   data: () => ({

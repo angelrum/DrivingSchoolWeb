@@ -178,31 +178,6 @@ export default {
       } else {
         event.preventDefault();
       }
-
-      // const key = event.key
-      // if (/\d/.test(key)) {
-      //   let phonenumber = '+7(';
-      //   if (!Object.is(this.user.phone, null)) {
-      //     let phone = this.user.phone.replace(phonenumber, '') + key
-      //     for (let num of phone) {
-      //       if (/\d/i.test(num) && phonenumber.length < 17) {
-      //         switch (phonenumber.length) {
-      //           case 6:phonenumber += ") "; break;
-      //           case 11:
-      //           case 14: phonenumber += "-"; break;
-      //         }
-      //         phonenumber += num;
-      //       }
-      //     }
-      //     phonenumber = phonenumber.substring(0, phonenumber.length - 1)
-      //   }
-      //   this.user.phone = phonenumber
-      //   return event
-      // } else if(Object.is(key, 'Backspace')) {
-      //   return event
-      // } else {
-      //   event.preventDefault()
-      // }
     },
     updateStyle() {
       document.querySelectorAll('.v-icon.v-icon--disabled')
