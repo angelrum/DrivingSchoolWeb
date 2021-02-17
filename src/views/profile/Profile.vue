@@ -14,7 +14,7 @@
             <h6 class="card-subtitle text-muted">Профиль текущего пользователя.</h6>
           </div>
           <div class="card-body">
-            <Loader v-if="loadingUser"/>
+            <Loader v-if="loading"/>
             <User v-else :is-edit="true" :input-user="user" @updateUser="getUserData"/>
           </div>
         </div>
@@ -22,13 +22,13 @@
     </div>
     <div v-if="!Object.is(company, null)" class="row">
       <div class="col-md-12">
-        <Loader v-if="loadingSchools"/>
-        <Company :company="company"/>
+        <Loader v-if="loading"/>
+        <Company v-else :company="company"/>
       </div>
     </div>
     <div class="row">
       <div class="col-md-12">
-        <Loader v-if="loadingSchools"/>
+        <Loader v-if="loading"/>
         <School v-else :schools="schools"/>
       </div>
     </div>
@@ -61,31 +61,31 @@ export default {
     },
     schools: null,
     company: null,
-    loadingUser: true,
-    loadingSchools: true
+    loading: true
   }),
   async mounted() {
-    this.schools = this.getUserData();
-    this.loadingSchools = false;
+    this.loading = true;
+    this.$store.dispatch('getAuthUser')
+        .then(async authUser => {
+          debugger
+          const user = await this.$store.dispatch('fetchUserById', authUser.id);
+          if (user.hasOwnProperty('schools')) {
+            this.schools = Object.assign([], user.schools);
+            delete user.schools;
+          }
+          if (user.hasOwnProperty('company')) {
+            this.company = Object.assign([], user.company);
+            delete user.company;
+          }
+          this.user = user;
+          return user;
+        })
+        .finally(()=> setTimeout(() => {
+          this.loading = false;
+        }, 500))
   },
   methods: {
-    async getUserData() {
-      this.loadingUser = true;
-      await this.$store.dispatch('getAuthUser')
-          .then(async authUser => {
-            const user = await this.$store.dispatch('fetchUserById', authUser.id);
-            if (user.hasOwnProperty('schools')) {
-              this.schools = Object.assign([], user.schools);
-              delete user.schools;
-            }
-            if (user.hasOwnProperty('company')) {
-              this.company = Object.assign([], user.company);
-              delete user.company;
-            }
-            this.user = user;
-          })
-          .finally(()=> setTimeout(() => this.loadingUser = false, 500))
-    }
+
   }
 }
 </script>
