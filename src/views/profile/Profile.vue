@@ -71,7 +71,6 @@ export default {
       this.loading = true;
       this.$store.dispatch('getAuthUser')
           .then(async authUser => {
-            debugger
             const user = await this.$store.dispatch('fetchUserById', authUser.id);
             if (user.hasOwnProperty('schools')) {
               this.schools = Object.assign([], user.schools);
