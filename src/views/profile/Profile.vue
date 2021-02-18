@@ -64,28 +64,30 @@ export default {
     loading: true
   }),
   async mounted() {
-    this.loading = true;
-    this.$store.dispatch('getAuthUser')
-        .then(async authUser => {
-          debugger
-          const user = await this.$store.dispatch('fetchUserById', authUser.id);
-          if (user.hasOwnProperty('schools')) {
-            this.schools = Object.assign([], user.schools);
-            delete user.schools;
-          }
-          if (user.hasOwnProperty('company')) {
-            this.company = Object.assign([], user.company);
-            delete user.company;
-          }
-          this.user = user;
-          return user;
-        })
-        .finally(()=> setTimeout(() => {
-          this.loading = false;
-        }, 500))
+    this.getUserData();
   },
   methods: {
-
+    getUserData() {
+      this.loading = true;
+      this.$store.dispatch('getAuthUser')
+          .then(async authUser => {
+            debugger
+            const user = await this.$store.dispatch('fetchUserById', authUser.id);
+            if (user.hasOwnProperty('schools')) {
+              this.schools = Object.assign([], user.schools);
+              delete user.schools;
+            }
+            if (user.hasOwnProperty('company')) {
+              this.company = Object.assign([], user.company);
+              delete user.company;
+            }
+            this.user = user;
+            return user;
+          })
+          .finally(()=> setTimeout(() => {
+            this.loading = false;
+          }, 500))
+    }
   }
 }
 </script>
