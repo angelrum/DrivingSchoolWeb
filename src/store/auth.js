@@ -7,7 +7,7 @@ export default {
     state: {
         status: '',
         token: localStorage.getItem('token') || '',
-        user: {}
+        user:  localStorage.getItem('auth_user') || ''
     },
     actions: {
         async login ({commit, dispatch}, {username, password}) {
@@ -27,31 +27,38 @@ export default {
             return new Promise(((resolve, reject) => {
                 commit('logout');
                 localStorage.removeItem('token');
+                localStorage.removeItem('auth_user');
                 delete axios.defaults.headers.common['x-csrf-token'];
                 resolve()
             }))
         },
-        getAuthUser({commit, dispatch}) {
+        //получаем авторизованного пользователя из localStorage или перезапрашиваем из БД с обновлением localStorage
+        getAuthUser({dispatch}) {
             return new Promise((resolve, reject) => {
                 let authUser = store.getters.authUser;
-                if (!!authUser) {
-                    axios.get(authUrl + 'user', {})
-                        .then((response) => {
-                            const token = response.headers['x-csrf-token'];
-                            const user = response.data;
-                            dispatch('successProcess', {user, token});
-                            resolve(user);
-                        }, (error) => {
-                            dispatch('errorProcess', error)
-                            reject(error);
-                        })
+                if (Object.keys(authUser).length === 0) {
+                    dispatch('refreshAuthUser').then(result => resolve(result))
                 } else {
                     resolve(authUser);
                 }
-
             })
         },
+        refreshAuthUser({dispatch}) { //обновляем localStorage
+            return new Promise(((resolve, reject) => {
+                axios.get(authUrl + 'user', {})
+                    .then((response) => {
+                        const token = response.headers['x-csrf-token'];
+                        const user = response.data;
+                        dispatch('successProcess', {user, token});
+                        resolve(user);
+                }, (error) => {
+                        dispatch('errorProcess', error)
+                        reject(error);
+                    })
+            }))
+        },
         successProcess({commit}, {user, token}) {
+            localStorage.setItem('auth_user', JSON.stringify(user));
             localStorage.setItem('token', token);
             axios.defaults.headers.common['x-csrf-token'] = token;
             commit('auth_success', {token, user});
@@ -70,7 +77,7 @@ export default {
         auth_success(state, {token, user}) {
             state.status = 'success';
             state.token = token;
-            state.user = user;
+            // state.user = user;
         },
         auth_error(state) {
             state.status = 'error';
@@ -83,6 +90,10 @@ export default {
     getters: {
         isLoggedIn: state => !!state.token,
         authStatus: state => state.status,
-        authUser: state => state.user
+        authUser: state => {
+            let user = state.user;
+            try { return JSON.parse(user);}
+            catch (e) { return user;}
+        }
     }
 }

@@ -14,16 +14,22 @@
             <h6 class="card-subtitle text-muted">Профиль текущего пользователя.</h6>
           </div>
           <div class="card-body">
-            <Loader v-if="loadingUser"/>
+            <Loader v-if="loading"/>
             <User v-else :is-edit="true" :input-user="user" @updateUser="getUserData"/>
           </div>
         </div>
       </div>
     </div>
+    <div v-if="!Object.is(company, null)" class="row">
+      <div class="col-md-12">
+        <Loader v-if="loading"/>
+        <Company v-else :company="company"/>
+      </div>
+    </div>
     <div class="row">
       <div class="col-md-12">
-        <Loader v-if="loadingSchools"/>
-        <School v-else :schools="schools"/>
+        <Loader v-if="loading"/>
+        <Schools v-else :schools="schools"/>
       </div>
     </div>
   </div>
@@ -31,12 +37,13 @@
 
 <script>
 import User from "@/components/User";
-import School from "@/components/School";
+import Schools from "@/components/Schools";
+import Company from "@/components/Company";
 import Loader from "@/components/app/Loader";
 
 export default {
   name: "Profile",
-  components: {School, User, Loader },
+  components: {Company, Schools, User, Loader },
   data: () => ({
     user: {
       id: null,
@@ -53,26 +60,33 @@ export default {
       score: 0
     },
     schools: null,
-    loadingUser: true,
-    loadingSchools: true
+    company: null,
+    loading: true
   }),
   async mounted() {
-    this.schools = this.getUserData();
-    this.loadingSchools = false;
+    this.getUserData();
   },
   methods: {
-    async getUserData() {
-      this.loadingUser = true;
-      let schools
-      await this.$store.dispatch('getAuthUser')
+    getUserData() {
+      this.loading = true;
+      this.$store.dispatch('getAuthUser')
           .then(async authUser => {
-            const user = await this.$store.dispatch('fetchUserById', authUser.id)
-            this.schools = Object.assign([], user.schools)
-            delete user.schools
+            debugger
+            const user = await this.$store.dispatch('fetchUserById', authUser.id);
+            if (user.hasOwnProperty('schools')) {
+              this.schools = Object.assign([], user.schools);
+              delete user.schools;
+            }
+            if (user.hasOwnProperty('company')) {
+              this.company = Object.assign([], user.company);
+              delete user.company;
+            }
             this.user = user;
+            return user;
           })
-          .finally(()=> setTimeout(() => this.loadingUser = false, 500))
-      return schools;
+          .finally(()=> setTimeout(() => {
+            this.loading = false;
+          }, 500))
     }
   }
 }
