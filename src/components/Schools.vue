@@ -8,7 +8,7 @@
       </v-expansion-panel-header>
       <v-expansion-panel-content>
         <v-row>
-          <v-col>
+          <v-col class="sm3">
             <v-text-field
                 disabled
                 readonly
@@ -47,7 +47,7 @@ import Address from "@/components/Address";
 export default {
   components: {Address},
   props: ['schools'],
-  name: "School",
+  name: "Schools",
   data: () => ({
     edit: true
   })

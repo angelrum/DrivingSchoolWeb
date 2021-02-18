@@ -29,7 +29,7 @@
     <div class="row">
       <div class="col-md-12">
         <Loader v-if="loading"/>
-        <School v-else :schools="schools"/>
+        <Schools v-else :schools="schools"/>
       </div>
     </div>
   </div>
@@ -37,13 +37,13 @@
 
 <script>
 import User from "@/components/User";
-import School from "@/components/School";
+import Schools from "@/components/Schools";
 import Company from "@/components/Company";
 import Loader from "@/components/app/Loader";
 
 export default {
   name: "Profile",
-  components: {Company, School, User, Loader },
+  components: {Company, Schools, User, Loader },
   data: () => ({
     user: {
       id: null,
