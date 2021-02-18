@@ -29,6 +29,15 @@ const routes = [
       requiresAuth: true
     },
     component: () => import('@/views/profile/Profile')
+  },
+  {
+    path: '/school',
+    name: 'school',
+    meta: {
+      layout: 'main',
+      requiresAuth: true
+    },
+    component: () => import('@/views/school/School')
   }
 ]
 
