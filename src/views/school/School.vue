@@ -1,117 +1,28 @@
 <template>
   <div class="col s12 m6">
     <h1 class="header-title">Страница школы "{{ schools.name }}"</h1>
-    <v-form>
-      <div class="col-md-12">
-        <div class="card">
-          <div class="card-header">
-            <h5 class="card-title">{{ schools.shortName }}</h5>
-            <h6 class="card-subtitle text-muted">Профиль текущей школы.</h6>
-          </div>
-          <div class="card-body">
-            <Loader v-if="loading"/>
-            <v-container>
-              <v-row>
-                <v-col>
-                  <v-text-field
-                    v-model="schools.shortName"
-                    :label="$tc('name', 2)"
-                    disabled
-                    readonly
-                    light
-                  ></v-text-field>
-                </v-col>
-
-                <v-col>
-                  <v-text-field
-                    v-model="schools.phone"
-                    :label="$t('phone')"
-                    disabled
-                    readonly
-                    light
-                  ></v-text-field>
-                </v-col>
-
-                <v-col>
-                  <v-text-field
-                    v-model="schools.email"
-                    :label="$t('email')"
-                    disabled
-                    readonly
-                    light
-                  ></v-text-field>
-                </v-col>
-              </v-row>
-              <v-row>
-                <v-col>
-                  <v-text-field
-                    disabled
-                    readonly
-                    v-model="address.city"
-                    light
-                    :label="$t('city')"
-                  ></v-text-field>
-                </v-col>
-
-                <v-col>
-                  <v-text-field
-                    disabled
-                    readonly
-                    v-model="address.street"
-                    light
-                    :label="$t('street')"
-                  ></v-text-field>
-                </v-col>
-              </v-row>
-              <v-row>
-                <v-col>
-                  <v-text-field
-                    disabled
-                    readonly
-                    v-model="address.building"
-                    light
-                    :label="$t('building')"
-                  ></v-text-field>
-                </v-col>
-                <v-col>
-                  <v-text-field
-                    disabled
-                    readonly
-                    v-model="address.home"
-                    light
-                    :label="$t('home')"
-                  ></v-text-field>
-                </v-col>
-                <v-col>
-                  <v-text-field
-                    disabled
-                    readonly
-                    v-model="address.floor"
-                    light
-                    :label="$t('floor')"
-                  ></v-text-field>
-                </v-col>
-                <v-col>
-                  <v-text-field
-                    disabled
-                    readonly
-                    v-model="address.office"
-                    light
-                    :label="$t('office')"
-                  ></v-text-field>
-                </v-col>
-              </v-row>
-            </v-container>
-          </div>
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="card-title">{{ schools.shortName }}</h5>
+          <h6 class="card-subtitle text-muted">Профиль текущей школы.</h6>
+        </div>
+        <div class="card-body">
+          <Loader v-if="loadingUser" />
+          <SchoolEdit v-else :is-edit="true" :input-school="schools" :input-address="address" @updateUser="getUserData" />
         </div>
       </div>
-    </v-form>
+    </div>
   </div>
 </template>
 
 <script>
+import SchoolEdit from "@/components/SchoolEdit";
+import Loader from "@/components/app/Loader";
+
 export default {
   name: "school",
+  components: { SchoolEdit, Loader  },
   data: () => ({
     schools: {},
     address: {},
@@ -120,7 +31,7 @@ export default {
     title: "Preliminary report",
     description: "California is a state in the western United States",
     rules: [(v) => v.length <= 25 || "Max 25 characters"],
-    wordsRules: [(v) => v.trim().split(" ").length <= 5 || "Max 5 words"],
+    wordsRules: [(v) => v.trim().split(" ").length <= 5 || "Max 5 words"]
   }),
   async mounted() {
     const schools = await this.getUserData();
