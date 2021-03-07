@@ -1,17 +1,11 @@
 <template>
-  <v-form ref="userForm" lazy-validation>
+  <v-form ref="userForm">
     <v-row>
       <v-col class="col-3 text-center">
-        <v-avatar width="100" height="100">
-          <img :src="user.avatar"
-               :alt="user.lastname + '_' + user.firstname"/>
+        <v-avatar width="150" height="150">
+          <img :src="avatar"
+               :alt="lastname + '_' + firstname"/>
         </v-avatar>
-<!--        <v-img-->
-<!--            :src="user.avatar"-->
-<!--            max-height="100"-->
-<!--            max-width="100"-->
-<!--            class="m-auto"-->
-<!--        ></v-img>-->
       </v-col>
       <v-col>
         <v-row>
@@ -20,10 +14,13 @@
                 :readonly="!edit"
                 :disabled="!edit"
                 :clearable="edit"
-                v-model="user.lastname"
+                clear-icon="fa-times"
+                v-model="lastname"
                 :counter="edit ? 30: null"
                 :label="$t('lastname')"
-                :rules="[rules.required]"
+                @input="$v.lastname.$touch()"
+                @blur="$v.lastname.$touch()"
+                :error-messages="lastnameErrors"
                 required>
             </v-text-field>
           </v-col>
@@ -32,11 +29,13 @@
                 :readonly="!edit"
                 :disabled="!edit"
                 :clearable="edit"
-                v-model="user.firstname"
+                clear-icon="fa-times"
+                v-model="firstname"
                 :counter="edit ? 30: null"
                 :label="$t('firstname')"
-                :rules="[rules.required]"
-                required>
+                @input="$v.firstname.$touch()"
+                @blur="$v.firstname.$touch()"
+                :error-messages="firstnameErrors">
             </v-text-field>
           </v-col>
           <v-col>
@@ -44,10 +43,10 @@
                 :readonly="!edit"
                 :disabled="!edit"
                 :clearable="edit"
-                v-model="user.middlename"
+                clear-icon="fa-times"
+                v-model="middlename"
                 :counter="edit ? 30: null"
-                :label="$t('middlename')"
-                required>
+                :label="$t('middlename')">
             </v-text-field>
           </v-col>
         </v-row>
@@ -57,13 +56,15 @@
                 :readonly="!edit"
                 :disabled="!edit"
                 :clearable="edit"
-                v-model="user.email"
+                clear-icon="fa-times"
+                v-model="email"
                 :counter="edit ? 30: null"
                 :label="$t('email')"
-                :append-icon="user.emailStatus ? 'fa-check-circle green--text':'fa-question-circle orange--text'"
-                :color="user.emailStatus ? 'green' : 'orange'"
-                :rules="[rules.email]"
-                required>
+                :append-icon="emailStatus ? 'fa-check-circle green--text':'fa-question-circle orange--text'"
+                :color="emailStatus ? 'green' : 'orange'"
+                @input="$v.email.$touch()"
+                @blur="$v.email.$touch()"
+                :error-messages="$v.email.$dirty && !$v.email.email ? $t('user.email.email'):null">
             </v-text-field>
           </v-col>
           <v-col>
@@ -71,28 +72,29 @@
                 :readonly="!edit"
                 :disabled="!edit"
                 :clearable="edit"
-                v-model="user.phone"
+                clear-icon="fa-times"
+                v-model="phone"
                 :counter="edit ? 17: null"
                 :label="$t('phone')"
-                :rules="[rules.phone]"
-                :append-icon="user.phoneStatus ? 'fa-check-circle green--text':'fa-question-circle orange--text'"
-                :color="user.phoneStatus ? 'green' : 'orange'"
-                @keydown="checkInputValue"
-                required>
+                :append-icon="phoneStatus ? 'fa-check-circle green--text':'fa-question-circle orange--text'"
+                :color="phoneStatus ? 'green' : 'orange'"
+                @input="$v.phone.$touch()"
+                @blur="$v.phone.$touch()"
+                @keydown="convertKeyToPhoneFormat"
+                :error-messages="$v.phone.$dirty && !$v.phone.required ? $t('required') : ( $v.phone.$dirty && !$v.phone.phoneFormat ? $t('phoneFormat') : null )">
             </v-text-field>
           </v-col>
           <v-col>
             <v-text-field
-                :append-icon="!show ? 'mdi-eye' : 'mdi-eye-off'"
-                :type="!show ? 'text': 'password'"
+                type="password"
                 :readonly="!edit"
                 :disabled="!edit"
-                @click:append="show = !show"
-                v-model="user.password"
+                v-model="password"
                 :counter="edit ? 20: null"
                 :label="$t('password')"
-                :rules="[rules.required, rules.min]"
-                required>
+                @input="$v.password.$touch()"
+                @blur="$v.password.$touch()"
+                :error-messages="passwordErrors">
             </v-text-field>
           </v-col>
         </v-row>
@@ -101,7 +103,7 @@
     <div v-if="isEdit">
       <v-row v-if="edit" class="justify-content-end">
         <v-col class="col-sm-auto" >
-          <button class="btn btn-pill btn-danger" @click.prevent="$emit('updateUser')">{{ $t('cancel') }}</button>
+          <button class="btn btn-pill btn-danger" @click.prevent="$emit('refreshUser')">{{ $t('cancel') }}</button>
         </v-col>
         <v-col class="col-sm-auto">
           <button class="btn btn-pill btn-success" @click.prevent="saveProfile">{{ $t('save') }}</button>
@@ -117,8 +119,14 @@
 </template>
 <script>
 
+import {email, required, minLength} from 'vuelidate/lib/validators'
+import {vuelidate} from "@/components/mixins/vuelidate";
+import {phone} from "@/components/mixins/phone";
+import {helpers} from "@/components/mixins/helpers";
+
 export default {
   name: "User",
+  mixins: [vuelidate, phone, helpers],
   props: {
     isEdit: Boolean,
     inputUser: {
@@ -131,53 +139,55 @@ export default {
     edit: false,
     show: true,
     user: {
-      avatar: '',
-      lastname: '',
-      firstname: '',
-      phone: '',
-      password: ''
+      type: Object
     },
-    rules: {
-      required: value => !!value || 'Не должно быть пустым',
-      min: value => value.length >= 3 || 'Не менее 3 символов',
-      email: (value) => {
-        if (!value) return true
-        const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-        return pattern.test(value) || 'Введите правильный email.'
-      },
-      phone: value => {
-        const pattern = /^(\+7|8)[- _]*\(?[- _]*(\d{3}[- _]*\)?([- _]*\d){7}|\d\d[- _]*\d\d[- _]*\)?([- _]*\d){6})$/
-        return pattern.test(value) || 'Введите правильный номер телефона.'
-      }
-    }
+    id: null,
+    firstname: '',
+    lastname: '',
+    phone: '',
+    email: '',
+    emailStatus: false,
+    phoneStatus: false,
+    middlename: '',
+    avatar: '',
+    password: '',
+    full_password: '******'
   }),
+  validations: {
+    firstname:  { required, minLength: minLength(3) },
+    lastname:   { required, minLength: minLength(3) },
+    email:      { email },
+    phone: {
+      required,
+      phoneFormat(val) {
+        return this.phonePattern.test(val); }
+    },
+    password: {required, minLength: minLength(3)}
+  },
+  computed: {
+    lastnameErrors() {
+      return this.vuelidateNameErrors('lastname');
+    },
+    firstnameErrors() {
+      return this.vuelidateNameErrors('firstname');
+    },
+    passwordErrors() {
+      return this.vuelidateNameErrors('password');
+    }
+  },
   methods: {
     async saveProfile() {
-      if (this.$refs.userForm.validate()) {
-        await this.$store.dispatch('updateUser', this.user)
-        await this.clearProfile()
-      } else {
-        this.$store.commit('setError', 'update.validation')
+      if (this.$v.$invalid) {
+        this.$v.$touch();
+        return
       }
-    },
-    async clearProfile() {
-      this.edit = !this.edit
-      const u = await this.$store.dispatch('fetchUserById', 1000)
-      delete u.schools
-      this.user = Object.assign({}, u)
-    },
-    async checkInputValue(event) {
-      const key = event.key
-      if (/\d/.test(key)) {
-        let ph = Object.is(this.user.phone, null) ? "" : this.user.phone;
-        let value = ph.replace('+7(', '') + key;
-        this.phone = await this.$store.dispatch("convertStringToPhone", value)
-        return event;
-      } else if (Object.is(key, 'Backspace')) {
-        return event;
-      } else {
-        event.preventDefault();
-      }
+      const user = {...this.inputUser};
+      Object.getOwnPropertyNames(user).forEach(val => {
+        if (this.hasOwnProperty(val) && val !== 'password') user[val] = this[val];
+      });
+      user.password = this.password === this.full_password ? '' : this.password;
+      await this.$store.dispatch('updateUser', user);
+      this.$emit('refreshUser');
     },
     updateStyle() {
       document.querySelectorAll('.v-icon.v-icon--disabled')
@@ -185,8 +195,27 @@ export default {
     }
   },
   mounted() {
-    this.updateStyle()
-    this.user = Object.assign({}, this.inputUser)
+    this.updateStyle();
+    this.password = this.full_password;
+  },
+  watch: {
+    inputUser: {
+      deep: true,
+      immediate: true,
+      handler: function(value) {
+        this.fillComponentFields(value);
+      }
+    },
+    email: {
+      handler: function (value) {
+        this.emailStatus = value === this.inputUser.email;
+      }
+    },
+    phone: {
+      handler: function (value) {
+        this.phoneStatus = value === this.inputUser.phone;
+      }
+    }
   },
   updated() {
     this.updateStyle()

@@ -27,10 +27,7 @@ export default {
   async created() {
     this.$store.dispatch('getAuthUser')
         .then(result => this.authUser = result)
-        .catch(error => {
-          debugger
-          this.$router.push('/login')
-        })
+        .catch(error => this.$router.push('/login'))
   },
   computed: {
     info() {
@@ -39,8 +36,8 @@ export default {
   },
   watch: {
     info(info) {
-      let html = ''
-      info.details.forEach(val => { html += Object.is(html, '') ? this.$t(val) : '<br>' + this.$t(val) })
+      let html = '';
+      info.details.forEach(val => { html += Object.is(html, '') ? this.$t(val) : '<br>' + this.$t(val) });
       this.$noty.hasOwnProperty(info.type)
           ? this.$noty[info.type](html)
           : this.$noty.error(html)
