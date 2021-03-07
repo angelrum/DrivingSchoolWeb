@@ -77,7 +77,7 @@
     <Address v-if="!isNull(company.addressActual) && !equalAddress" :address="company.addressActual"
              :title="$tc('address.actual')" :edit="edit"/>
     <label class="custom-control custom-checkbox">
-      <input v-model="equalAddress" type="checkbox" role="checkbox" class="custom-control-input">
+      <input v-model="equalAddress" type="checkbox" role="checkbox" :disabled="!edit" class="custom-control-input">
       <span class="custom-control-label h6">Фактический адрес совпадает с юридическим</span>
     </label>
     <div v-if="isEdit">
@@ -160,7 +160,7 @@ export default {
       deep: true,
       immediate: true,
       handler: function (value) {
-        this.company = {...value};
+        this.company = this.looseClone(value);
         this.equalAddress = this.company.addressActual.id === this.company.addressLegal.id;
       }
     }
@@ -171,15 +171,18 @@ export default {
         this.$v.$touch();
         return
       }
-      if (this.equalAddress) {
-        this.company.addressLegal = this.company.addressActual;
+      const al = this.company.addressLegal;
+      const aa = this.company.addressActual;
+      if (this.equalAddress) { //адреса равны
+        this.company.addressLegal = aa;
+      } else if(al.id === aa.id && !this.equalAddress) { //ранее адреса были равны, но теперь их разъединили
+        delete this.company.addressActual.id; //удаляем id, что бы был создан новый адрес
       }
       await this.$store.dispatch('updateCompany', this.company);
       this.$emit('refreshCompany');
     },
     checkPhoneKey(event) {
       let result = this.convertKeyToPhoneFormat(event);
-      debugger
       if (!this.isNull(result) && /\d/.test(result.key)) {
         let ph = this.isNull(this.company.phone) ? '' : this.company.phone;
         let value = ph.replace('+7(', '') + result.key;
