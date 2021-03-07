@@ -14,21 +14,28 @@
             <h6 class="card-subtitle text-muted">Профиль текущего пользователя.</h6>
           </div>
           <div class="card-body">
-            <Loader v-if="loading"/>
-            <User v-else :is-edit="true" :input-user="user" @updateUser="getUserData"/>
+            <Loader v-if="loadUser"/>
+            <User v-else :is-edit="true" :input-user="user" @refreshUser="getUserData"/>
           </div>
         </div>
       </div>
     </div>
-    <div v-if="!Object.is(company, null)" class="row">
+    <div v-if="!isNull(company)" class="row">
       <div class="col-md-12">
-        <Loader v-if="loading"/>
-        <Company v-else :company="company"/>
+        <div class="card">
+          <div class="card-header">
+            <h6 class="card-title">Данные о компании.</h6>
+          </div>
+          <div class="card-body">
+            <Loader v-if="loadCompany"/>
+            <Company v-else :in-company="company" @refreshCompany="getCompanyData" :is-edit="this.$store.getters.isAdmin"/>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="row">
+    <div v-if="!isNull(schools)" class="row">
       <div class="col-md-12">
-        <Loader v-if="loading"/>
+        <Loader v-if="loadSchools"/>
         <Schools v-else :schools="schools"/>
       </div>
     </div>
@@ -40,9 +47,11 @@ import User from "@/components/User";
 import Schools from "@/components/Schools";
 import Company from "@/components/Company";
 import Loader from "@/components/app/Loader";
+import {helpers} from "@/components/mixins/helpers";
 
 export default {
   name: "Profile",
+  mixins: [helpers],
   components: {Company, Schools, User, Loader },
   data: () => ({
     user: {
@@ -56,36 +65,53 @@ export default {
       emailStatus: false,
       phone: '',
       phoneStatus: false,
-      password:'',
       score: 0
     },
     schools: null,
     company: null,
-    loading: true
+    loadUser: true,
+    loadCompany: true,
+    loadSchools: true
   }),
   async mounted() {
-    this.getUserData();
+    //получаем все данные: пользователя, компанию, школы
+    this.$store.dispatch('getAuthUser').then(async authUser => {
+          const user = await this.$store.dispatch('fetchUserById', authUser.id);
+          if (user.hasOwnProperty('schools')) {
+            this.schools = {...user.schools};
+            delete user.schools;
+          }
+          if (user.hasOwnProperty('company')
+              && authUser.roles.includes('ADMIN')) {
+            this.company = {...user.company};
+            delete user.company;
+          }
+          this.user = user;
+        })
+        .finally(()=> setTimeout(() => {
+          this.loadUser = false;
+          this.loadSchools = false;
+          this.loadCompany = false;
+        }, 500))
   },
   methods: {
-    getUserData() {
-      this.loading = true;
-      this.$store.dispatch('getAuthUser')
-          .then(async authUser => {
-            const user = await this.$store.dispatch('fetchUserById', authUser.id);
-            if (user.hasOwnProperty('schools')) {
-              this.schools = Object.assign([], user.schools);
-              delete user.schools;
-            }
-            if (user.hasOwnProperty('company')) {
-              this.company = Object.assign([], user.company);
-              delete user.company;
-            }
-            this.user = user;
-            return user;
-          })
-          .finally(()=> setTimeout(() => {
-            this.loading = false;
-          }, 500))
+    //обновляем только пользователя
+    async getUserData() {
+      this.loadUser = true;
+      this.$store.dispatch('refreshAuthUser').then((user) => {
+        delete user.schools;
+        delete user.company;
+        this.user = {...user}
+      }).finally(()=> setTimeout(() => {this.loadUser = false;}, 500))
+    },
+    //обновляем только данные компании
+    async getCompanyData() {
+      this.loadCompany = true;
+      this.$store.dispatch('refreshAuthUser').then((user) => {
+        this.company = ( user.hasOwnProperty('company')
+            && this.$store.getters.isAdmin )
+            ? {...user.company} : null;
+      }).finally(()=> setTimeout(() => {this.loadCompany = false;}, 500));
     }
   }
 }

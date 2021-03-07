@@ -10,13 +10,15 @@
             <v-row>
               <v-col>
                 <v-text-field
-                    v-model="login"
+                    v-model="phone"
                     prepend-inner-icon="fas fa-phone"
                     :label="$t('phone')"
                     clearable
                     clear-icon="fa-times"
-                    @keydown="convertInputValue"
-                    :rules="[rules.required, rules.phonenumber]"
+                    @keydown="convertKeyToPhoneFormat"
+                    @input="$v.phone.$touch()"
+                    @blur="$v.phone.$touch()"
+                    :error-messages="$v.phone.$dirty && !$v.phone.required ? $t('required') : ( $v.phone.$dirty && !$v.phone.phoneFormat ? $t('phoneFormat') : null )"
                     class="f-size"
                     :success="success"
                     :error="error">
@@ -28,7 +30,9 @@
                     @click:append="show = !show"
                     prepend-inner-icon="fa-unlock-alt"
                     :label="$t('password')"
-                    :rules="[rules.required]"
+                    @input="$v.password.$touch()"
+                    @blur="$v.password.$touch()"
+                    :error-messages="passwordErrors"
                     :success="success"
                     :error="error">
                 </v-text-field>
@@ -60,52 +64,53 @@
 </template>
 
 <script>
+
+import { phone } from "@/components/mixins/phone";
+import { vuelidate } from "@/components/mixins/vuelidate";
+import { required } from 'vuelidate/lib/validators'
+
 export default {
-name: "Login",
+  mixins: [phone, vuelidate],
+  name: "Login",
   data: () => ({
     show: false,
-    login: "",
+    phone: "",
     password: "",
     success: false,
-    rules: {
-      required: value => !!value || 'Не должно быть пустым',
-      phonenumber: value => {
-        const pattern = /^(\+7|8)[- _]*\(?[- _]*(\d{3}[- _]*\)?([- _]*\d){7}|\d\d[- _]*\d\d[- _]*\)?([- _]*\d){6})$/
-        return pattern.test(value) || 'Введите правильный номер телефона.'
-      }
-    },
     error: false,
     timeout: 2000
   }),
-  methods: {
-    async convertInputValue(event) {
-      const key = event.key
-      if (/\d/.test(key)) {
-        let phone = Object.is(this.login, null) ? "" : this.login;
-        let value = phone.replace('+7(', '') + key;
-        this.login = await this.$store.dispatch("convertStringToPhone", value)
-        return event;
-      } else if (Object.is(key, 'Backspace')) {
-        return event;
-      } else {
-        event.preventDefault();
-      }
+  validations: {
+    password: { required },
+    phone: {
+      required,
+      phoneFormat(val) {
+        return this.phonePattern.test(val); }
     },
+  },
+  computed: {
+    passwordErrors() {
+      return this.vuelidateNameErrors('password');
+    }
+  },
+  methods: {
     async signIn() {
-      if (this.$refs.authForm.validate()) {
-        await this.$store.dispatch("login", { username: this.login, password: this.password })
-            .then(() => {
-              this.success = true;
-              setTimeout(() => { this.$router.push({name: 'home'})}, 500)
-            })
-            .catch(() => {
-              this.error = true;
-            });
+      if (this.$v.$invalid) {
+        this.$v.$touch();
+        return
       }
+      await this.$store.dispatch('login', { username: this.phone, password: this.password })
+          .then(() => {
+            this.success = true;
+            setTimeout(() => { this.$router.push({name: 'home'})}, 500)
+          })
+          .catch(() => {
+            this.error = true;
+          });
     }
   },
   mounted() {
-    this.login = '+7(911) 111-11-11';
+    this.phone = '+7(911) 111-11-11';
     this.password = '12345'
   }
 }

@@ -1,3 +1,15 @@
 input[type="text"]:disabled {
     color: black !important;
 }
+/*input[type=checkbox] {*/
+/*    opacity: 1!important;*/
+/*    !*width: 80%!important;*!*/
+/*    !*height: 80%!important;*!*/
+/*}*/
+/*.v-input--selection-controls__input input[role=checkbox] {*/
+/*    width: 80%!important;*/
+/*    height: 80%!important;*/
+/*}*/
+/*.h6 label {*/
+/*    font-weight: 400!important;*/
+/*}*/

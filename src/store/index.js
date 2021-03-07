@@ -1,8 +1,8 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import user from "@/store/user";
-import common from "@/store/common";
 import auth from "@/store/auth";
+import company from "@/store/company";
 
 Vue.use(Vuex)
 
@@ -26,8 +26,12 @@ export default new Vuex.Store({
     information: null
   },
   mutations: {
-    setError: (state, stack) =>
-        state.information = {type: state.NotyType.ERROR, details: getDetailsData(stack.response)},
+    setError: (state, stack) => {
+      state.information = {type: state.NotyType.ERROR, details: getDetailsData(stack.response)};
+      if (stack.response.status === 401 || stack.response.status === 404) {
+
+      }
+    },
     setSuccess: (state, text) =>
         state.information = {type: state.NotyType.SUCCESS, details: [text]}
   },
@@ -35,6 +39,6 @@ export default new Vuex.Store({
     info: n => n.information
   },
   modules: {
-    user, common, auth
+    user, auth, company
   }
 })

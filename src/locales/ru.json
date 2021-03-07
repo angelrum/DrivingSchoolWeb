@@ -20,6 +20,10 @@
   "region": "Регион",
   "street": "Улица",
   "zip": "Индекс",
+  "required": "Поле не должно быть пустым",
+  "numeric": "Значение должно быть числом",
+  "phoneFormat": "Не соответствует формату 7(911)111-11-11",
+  "minLength": "Значение должно быть больше {} символов",
   "update.success": "Данные успешно обновлены",
   "update.validation": "Есть не проверенные данные",
   "error_404": "Сервер временно недоступен",
@@ -37,6 +41,9 @@
   "exception.duplicate.telnumber": "Пользователь с таким номером телефона уже существует",
   "exception.duplicate.school": "Школа с таким названием уже существует",
   "exception.duplicate.school.student": "Пользователь уже добавлен к школе",
+
+  "error.authorization": "Ошибка авторизации",
+  "session.invalid": "Сессия окончена",
 
   "user.firstname.notblank": "\"Имя\" не должно быть пустым",
   "user.lastname.notblank": "\"Фамилия\" не должно быть пустым",

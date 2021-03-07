@@ -1,5 +1,6 @@
 import axios from "axios";
 import store from '@/store'
+import router from "@/router";
 const authUrl = 'http://localhost:8080/auth/';
 
 //https://webdevblog.ru/autentifikacii-v-vue-s-ispolzovaniem-vuex/
@@ -21,16 +22,17 @@ export default {
                     return user;
                 }, (error) => {
                     dispatch('errorProcess', error)
+                    throw error;
                 });
             },
         async logout({commit}) {
-            return new Promise(((resolve, reject) => {
-                commit('logout');
-                localStorage.removeItem('token');
-                localStorage.removeItem('auth_user');
-                delete axios.defaults.headers.common['x-csrf-token'];
-                resolve()
-            }))
+            commit('logout');
+            await axios.post(authUrl + 'logout', {})
+                .finally(() => {
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('auth_user');
+                    delete axios.defaults.headers.common['x-csrf-token'];
+                })
         },
         //получаем авторизованного пользователя из localStorage или перезапрашиваем из БД с обновлением localStorage
         getAuthUser({dispatch}) {
@@ -52,10 +54,19 @@ export default {
                         dispatch('successProcess', {user, token});
                         resolve(user);
                 }, (error) => {
-                        dispatch('errorProcess', error)
+                        dispatch('checkAuthError', error)
                         reject(error);
                     })
             }))
+        },
+        checkAuthError({dispatch, commit}, e) {
+            commit('setError', e)
+            if (e.response.status === 401 || e.response.status === 404) {
+                dispatch('logout');
+                router.push('/login');
+                return e;
+            }
+            throw e;
         },
         successProcess({commit}, {user, token}) {
             localStorage.setItem('auth_user', JSON.stringify(user));
@@ -90,6 +101,10 @@ export default {
     getters: {
         isLoggedIn: state => !!state.token,
         authStatus: state => state.status,
+        isAdmin: state => {
+            let user = JSON.parse(state.user);
+            return user.roles.includes('ADMIN');
+        },
         authUser: state => {
             let user = state.user;
             try { return JSON.parse(user);}
