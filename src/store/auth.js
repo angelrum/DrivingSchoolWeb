@@ -15,10 +15,10 @@ export default {
             commit('auth_request');
             return await axios.post(authUrl + 'login', {}, {
                 auth: {username, password}
-            }).then((response) => {
+            }).then(async (response) => {
                     const token = response.headers['x-csrf-token'];
                     const user = response.data;
-                    dispatch('successProcess', {user, token});
+                    await dispatch('successProcess', {user, token}); //нужно дождаться записи
                     return user;
                 }, (error) => {
                     dispatch('errorProcess', error)
@@ -99,7 +99,7 @@ export default {
         }
     },
     getters: {
-        isLoggedIn: state => !!state.token,
+        isLoggedIn: state => !!state.user,
         authStatus: state => state.status,
         isAdmin: state => {
             let user = JSON.parse(state.user);

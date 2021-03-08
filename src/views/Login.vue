@@ -102,7 +102,7 @@ export default {
       await this.$store.dispatch('login', { username: this.phone, password: this.password })
           .then(() => {
             this.success = true;
-            setTimeout(() => { this.$router.push({name: 'home'})}, 500)
+            setTimeout(() => { this.$router.push({name: 'home'}) }, 500)
           })
           .catch(() => {
             this.error = true;
