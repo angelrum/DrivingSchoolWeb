@@ -24,3 +24,5 @@ https://kazupon.github.io/vue-i18n/guide/formatting.html#support-ruby-on-rails-i
 
 ## vuejs-noty
 https://github.com/renoguyon/vuejs-noty?ref=madewithvuejs.com
+
+test
