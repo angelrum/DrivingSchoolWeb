@@ -8,6 +8,9 @@
             :label="$tc('name', 2)"
             :readonly="!edit"
             :disabled="!edit"
+            :clearable="edit"
+            clear-icon="fa-times"
+            @input="$v.name.$touch()"
             light
           ></v-text-field>
         </v-col>
@@ -32,65 +35,9 @@
           ></v-text-field>
         </v-col>
       </v-row>
-      <v-row>
-        <v-col>
-          <v-text-field
-            :readonly="!edit"
-            :disabled="!edit"
-            v-model="address.city"
-            light
-            :label="$t('city')"
-          ></v-text-field>
-        </v-col>
 
-        <v-col>
-          <v-text-field
-            :readonly="!edit"
-            :disabled="!edit"
-            v-model="address.street"
-            light
-            :label="$t('street')"
-          ></v-text-field>
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col>
-          <v-text-field
-            :readonly="!edit"
-            :disabled="!edit"
-            v-model="address.building"
-            light
-            :label="$t('building')"
-          ></v-text-field>
-        </v-col>
-        <v-col>
-          <v-text-field
-            :readonly="!edit"
-            :disabled="!edit"
-            v-model="address.home"
-            light
-            :label="$t('home')"
-          ></v-text-field>
-        </v-col>
-        <v-col>
-          <v-text-field
-            :readonly="!edit"
-            :disabled="!edit"
-            v-model="address.floor"
-            light
-            :label="$t('floor')"
-          ></v-text-field>
-        </v-col>
-        <v-col>
-          <v-text-field
-            :readonly="!edit"
-            :disabled="!edit"
-            v-model="address.office"
-            light
-            :label="$t('office')"
-          ></v-text-field>
-        </v-col>
-      </v-row>
+      <Address v-if="!isNull(address)" :is-edit="isEdit" :address="address" />
+
     </v-container>
 
     <div v-if="isEdit">
@@ -104,7 +51,7 @@
           </button>
         </v-col>
         <v-col class="col-sm-auto">
-          <button class="btn btn-pill btn-success" @click.prevent="saveProfile">
+          <button class="btn btn-pill btn-success" @click.prevent="saveSchool">
             {{ $t("save") }}
           </button>
         </v-col>
@@ -123,8 +70,15 @@
   </v-form>
 </template>
 <script>
+import Address from "@/components/Address";
+import { helpers } from "@/components/mixins/helpers";
+import { vuelidate } from "@/components/mixins/vuelidate";
+import { phone } from "@/components/mixins/phone";
+import {email, minLength, required} from "vuelidate/lib/validators";
 export default {
   name: "SchoolEdit",
+  components: {Address},
+  mixins: [helpers, vuelidate, phone],
   props: {
     isEdit: Boolean,
     inputSchool: {
@@ -134,53 +88,46 @@ export default {
     inputAddress: {
       type: Object,
       required: true,
-    },
+    }
   },
   data: () => ({
     count: 0,
     edit: false,
     show: true,
+    active: "",
     school: {
+      id: "",
       name: "",
+      shortName: "",
       phone: "",
       email: "",
     },
     address: {
+      id: "",
+      country: "",
+      region: "",
       city: "",
+      zip: "",
       street: "",
-      build: "",
-      house: "",
+      home: "",
       floor: "",
-      ofice: "",
+      office: ""
     },
-    rules: {
-      required: (value) => !!value || "Не должно быть пустым",
-      min: (value) => value.length >= 3 || "Не менее 3 символов",
-      email: (value) => {
-        if (!value) return true;
-        const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-        return pattern.test(value) || "Введите правильный email.";
-      },
-      phone: (value) => {
-        const pattern = /^(\+7|8)[- _]*\(?[- _]*(\d{3}[- _]*\)?([- _]*\d){7}|\d\d[- _]*\d\d[- _]*\)?([- _]*\d){6})$/;
-        return pattern.test(value) || "Введите правильный номер телефона.";
-      },
+    validations: {
+      name:  { required, minLength: minLength(3) },
+      shortName:   { required, minLength: minLength(3) },
+      email:      { email },
+      phone: {
+        required,
+        phoneFormat(val) {
+          return this.phonePattern.test(val); }
+      }
     },
   }),
   methods: {
-    async saveProfile() {
-      if (this.$refs.userForm.validate()) {
-        await this.$store.dispatch("updateUser", this.user);
-        await this.clearProfile();
-      } else {
-        this.$store.commit("setError", "update.validation");
-      }
-    },
-    async clearProfile() {
-      this.edit = !this.edit;
-      const u = await this.$store.dispatch("fetchUserById", 1000);
-      delete u.schools;
-      this.user = Object.assign({}, u);
+    async saveSchool() {
+      await this.$store.dispatch("updateSchool", this.school);
+      this.$emit('refreshSchool');
     },
     async checkInputValue(event) {
       const key = event.key;
@@ -203,8 +150,8 @@ export default {
   },
   mounted() {
     this.updateStyle();
-    debugger;
     this.school = Object.assign({}, this.inputSchool);
+    delete this.school.companyId;
     this.address = Object.assign({}, this.inputAddress);
   },
   updated() {

@@ -21,8 +21,8 @@ import SchoolEdit from "@/components/SchoolEdit";
 import Loader from "@/components/app/Loader";
 
 export default {
-  name: "school",
-  components: { SchoolEdit, Loader },
+  name: "SchoolsList",
+  components: { SchoolEdit, Loader  },
   data: () => ({
     schools: {},
     address: {},

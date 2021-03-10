@@ -31,13 +31,22 @@ const routes = [
     component: () => import('@/views/profile/Profile')
   },
   {
-    path: '/school',
+    path: '/school/:id',
     name: 'school',
     meta: {
       layout: 'main',
       requiresAuth: true
     },
     component: () => import('@/views/school/School')
+  },
+  {
+    path: '/schools',
+    name: 'SchoolsList',
+    meta: {
+      layout: 'main',
+      requiresAuth: true
+    },
+    component: () => import('@/views/school/SchoolsList')
   }
 ]
 
