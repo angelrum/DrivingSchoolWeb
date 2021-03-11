@@ -1,18 +1,29 @@
 <template>
-  <div class="col s12 m6">
-    <h1 class="header-title">Страница школы "{{ schools.name }}"</h1>
-    <div class="col-md-12">
-      <div class="card">
-        <div class="card-header">
-          <h5 class="card-title">{{ schools.shortName }}</h5>
-          <h6 class="card-subtitle text-muted">Профиль текущей школы.</h6>
-        </div>
-        <div class="card-body">
-          <Loader v-if="loadingUser" />
-          <SchoolEdit v-else :is-edit="true" :input-school="schools" :input-address="address" @refreshSchool="getSchoolData" />
-        </div>
-      </div>
-    </div>
+  <div id="app">
+    <v-app id="inspire">
+      <v-card>
+        <v-card-title>
+          <v-text-field
+              v-model="search"
+              append-icon="mdi-magnify"
+              label="Search"
+              single-line
+              hide-details
+          ></v-text-field>
+        </v-card-title>
+        <v-data-table
+            :headers="headers"
+            :items="schools"
+            :search="search"
+        >
+          <template #item.name="{ item }">
+            <router-link :to="{name: 'school', params: { id: item.id }}">
+              {{ item.name }}
+            </router-link>
+          </template>
+        </v-data-table>
+      </v-card>
+    </v-app>
   </div>
 </template>
 
@@ -22,36 +33,45 @@ import Loader from "@/components/app/Loader";
 
 export default {
   name: "SchoolsList",
-  components: { SchoolEdit, Loader  },
+  components: { SchoolEdit, Loader },
   data: () => ({
-    schools: {},
+    schools: [],
     address: {},
-    loadingUser: true,
     loadingSchools: true,
-    title: "Preliminary report",
-    description: "California is a state in the western United States",
-    rules: [(v) => v.length <= 25 || "Max 25 characters"],
-    wordsRules: [(v) => v.trim().split(" ").length <= 5 || "Max 5 words"]
+    search: '',
+    headers: [
+      {
+        text: 'Название',
+        align: 'start',
+        filterable: true,
+        value: 'name',
+      },
+      { text: 'Город', value: 'address.city' },
+      { text: 'Улица', value: 'address.street' },
+      { text: 'Телефон', value: 'phone' }
+    ],
+
+
   }),
   async mounted() {
-    const id = this.$route.params.id;
-    this.schools = await this.getSchoolData(id);
-    this.address = this.schools.address;
+
+    this.schools = await this.getAllSchool();
     console.log(this.schools);
-    console.log(this.address);
+
     this.loadingSchools = false;
   },
   methods: {
-    async getSchoolData(id) {
-      this.loadingUser = true;
-      let school;
+    async getAllSchool() {
+      this.loadingSchools = true;
+      let schools;
       await this.$store
           .dispatch("getAuthUser")
           .then(async (authUser) => {
-            school = await this.$store.dispatch("fetchSchoolById", id);
+
+            schools = await this.$store.dispatch("fetchAllSchool");
           })
-          .finally(() => setTimeout(() => (this.loadingUser = false), 500));
-      return school;
+          .finally(() => setTimeout(() => (this.loadingSchools = false), 500));
+      return schools;
     }
   }
 };

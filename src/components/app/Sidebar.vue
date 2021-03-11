@@ -26,7 +26,7 @@
             <li class="sidebar-item active"><a class="sidebar-link" href="#">Страница 1</a></li>
             <li class="sidebar-item"><a class="sidebar-link" href="#">Страница 2</a></li>
             <li class="sidebar-item"><a class="sidebar-link" href="#">Страница 3</a></li>
-            <li class="sidebar-item"><router-link class="sidebar-link" to='/school'>Школа</router-link></li>
+            <li class="sidebar-item"><router-link class="sidebar-link" to='/schools'>Школы</router-link></li>
           </ul>
         </li>
         <li class="sidebar-item"><a class="sidebar-link" href="#">
