@@ -44,7 +44,7 @@
 
   "error.authorization": "Ошибка авторизации",
   "session.invalid": "Сессия окончена",
-
+  "goto": "Перейти",
   "user.firstname.notblank": "\"Имя\" не должно быть пустым",
   "user.lastname.notblank": "\"Фамилия\" не должно быть пустым",
   "user.email.email": "\"Email\" не соответствует формату"

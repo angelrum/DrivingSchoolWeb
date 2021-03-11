@@ -37,6 +37,13 @@
           </v-col>
         </v-row>
         <Address :address="school.address"/>
+        <v-row class="justify-content-end">
+          <v-col class="col-sm-auto" >
+            <v-btn small color="primary" class="btn" :to="{name:'school', params: { id: school.id }}">
+              {{ $t('goto') }}
+            </v-btn>
+          </v-col>
+        </v-row>
       </v-expansion-panel-content>
     </v-expansion-panel>
   </v-expansion-panels>
