@@ -26,6 +26,7 @@ export default {
   data: () => ({
     schools: {},
     address: {},
+    id: '',
     loadingUser: true,
     loadingSchools: true,
     title: "Preliminary report",
@@ -34,9 +35,10 @@ export default {
     wordsRules: [(v) => v.trim().split(" ").length <= 5 || "Max 5 words"]
   }),
   async mounted() {
-    const id = this.$route.params.id;
-    this.schools = await this.getSchoolData(id);
+    this.id = this.$route.params.id;
+    this.schools = await this.getSchoolData(this.id);
     this.address = this.schools.address;
+    console.log("Это вывод со школы");
     console.log(this.schools);
     console.log(this.address);
     this.loadingSchools = false;

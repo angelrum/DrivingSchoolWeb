@@ -23,9 +23,9 @@
             <i class="align-middle mr-2 fas fa-fw fa-home"></i> <span class="align-middle">Главная</span>
           </a>
           <ul id="dashboards" class="sidebar-dropdown list-unstyled collapse show" data-parent="#sidebar">
-            <li class="sidebar-item active"><a class="sidebar-link" href="#">Страница 1</a></li>
-            <li class="sidebar-item"><a class="sidebar-link" href="#">Страница 2</a></li>
-            <li class="sidebar-item"><a class="sidebar-link" href="#">Страница 3</a></li>
+            <li class="sidebar-item active"><a class="sidebar-link" href="#">Ученики</a></li>
+            <li class="sidebar-item"><a class="sidebar-link" href="#">Учетиля</a></li>
+            <li class="sidebar-item"><a class="sidebar-link" href="#">Инструкторы</a></li>
             <li class="sidebar-item"><router-link class="sidebar-link" to='/schools'>Школы</router-link></li>
           </ul>
         </li>

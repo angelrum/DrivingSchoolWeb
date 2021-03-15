@@ -21,6 +21,9 @@
             :label="$t('phone')"
             :readonly="!edit"
             :disabled="!edit"
+            :clearable="edit"
+            clear-icon="fa-times"
+            @input="$v.phone.$touch()"
             light
           ></v-text-field>
         </v-col>
@@ -31,12 +34,14 @@
             :label="$t('email')"
             :readonly="!edit"
             :disabled="!edit"
+            clear-icon="fa-times"
+            @input="$v.email.$touch()"
             light
           ></v-text-field>
         </v-col>
       </v-row>
 
-      <Address v-if="!isNull(address)" :is-edit="isEdit" :address="address" />
+      <Address v-if="!isNull(school.address)" :edit="edit" :address="school.address" />
 
     </v-container>
 
@@ -45,7 +50,7 @@
         <v-col class="col-sm-auto">
           <button
             class="btn btn-pill btn-danger"
-            @click.prevent="$emit('updateUser')"
+            @click.prevent="$emit('refreshSchool', school.id)"
           >
             {{ $t("cancel") }}
           </button>
@@ -101,17 +106,17 @@ export default {
       shortName: "",
       phone: "",
       email: "",
-    },
-    address: {
-      id: "",
-      country: "",
-      region: "",
-      city: "",
-      zip: "",
-      street: "",
-      home: "",
-      floor: "",
-      office: ""
+      address: {
+        id: "",
+        country: "",
+        region: "",
+        city: "",
+        zip: "",
+        street: "",
+        home: "",
+        floor: "",
+        office: ""
+      }
     },
     validations: {
       name:  { required, minLength: minLength(3) },
@@ -127,20 +132,8 @@ export default {
   methods: {
     async saveSchool() {
       await this.$store.dispatch("updateSchool", this.school);
-      this.$emit('refreshSchool');
-    },
-    async checkInputValue(event) {
-      const key = event.key;
-      if (/\d/.test(key)) {
-        let ph = Object.is(this.user.phone, null) ? "" : this.user.phone;
-        let value = ph.replace("+7(", "") + key;
-        this.phone = await this.$store.dispatch("convertStringToPhone", value);
-        return event;
-      } else if (Object.is(key, "Backspace")) {
-        return event;
-      } else {
-        event.preventDefault();
-      }
+      this.school = await this.$emit('refreshSchool', this.school.id);
+      //this.$emit('refreshSchool');
     },
     updateStyle() {
       document
@@ -153,6 +146,25 @@ export default {
     this.school = Object.assign({}, this.inputSchool);
     delete this.school.companyId;
     this.address = Object.assign({}, this.inputAddress);
+    console.log("Это вывод с редактора");
+    console.log(this.school);
+    console.log(this.address);
+  },
+  watch: {
+    inputSchool: {
+      deep: true,
+      immediate: true,
+      handler: function(value) {
+        this.fillComponentFields(value);
+      }
+    },
+    inputAddress: {
+      deep: true,
+      immediate: true,
+      handler: function(value) {
+        this.fillComponentFields(value);
+      }
+    }
   },
   updated() {
     this.updateStyle();

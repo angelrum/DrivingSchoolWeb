@@ -56,8 +56,6 @@ export default {
   async mounted() {
 
     this.schools = await this.getAllSchool();
-    console.log(this.schools);
-
     this.loadingSchools = false;
   },
   methods: {
@@ -72,6 +70,18 @@ export default {
           })
           .finally(() => setTimeout(() => (this.loadingSchools = false), 500));
       return schools;
+    },
+    async getSchoolById(id) {
+      this.loadingSchools = true;
+      let school;
+      await this.$store
+          .dispatch("getAuthUser")
+          .then(async (authUser) => {
+
+            school = await this.$store.dispatch("fetchSchoolById", id);
+          })
+          .finally(() => setTimeout(() => (this.loadingSchools = false), 500));
+      return school;
     }
   }
 };
