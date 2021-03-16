@@ -9,7 +9,7 @@
         </div>
         <div class="card-body">
           <Loader v-if="loadingUser" />
-          <SchoolEdit v-else :is-edit="true" :input-school="schools" :input-address="address" @refreshSchool="getSchoolData" />
+          <SchoolEdit v-else :is-edit="true" :input-school="schools" @refreshSchool="getSchoolData" />
         </div>
       </div>
     </div>
@@ -25,7 +25,6 @@ export default {
   components: { SchoolEdit, Loader },
   data: () => ({
     schools: {},
-    address: {},
     id: '',
     loadingUser: true,
     loadingSchools: true,
@@ -36,24 +35,20 @@ export default {
   }),
   async mounted() {
     this.id = this.$route.params.id;
-    this.schools = await this.getSchoolData(this.id);
-    this.address = this.schools.address;
+    await this.getSchoolData();
     console.log("Это вывод со школы");
     console.log(this.schools);
-    console.log(this.address);
     this.loadingSchools = false;
   },
   methods: {
-    async getSchoolData(id) {
+    async getSchoolData() {
       this.loadingUser = true;
-      let school;
       await this.$store
           .dispatch("getAuthUser")
           .then(async (authUser) => {
-            school = await this.$store.dispatch("fetchSchoolById", id);
+            this.schools = await this.$store.dispatch("fetchSchoolById", this.id);
           })
           .finally(() => setTimeout(() => (this.loadingUser = false), 500));
-      return school;
     }
   }
 };

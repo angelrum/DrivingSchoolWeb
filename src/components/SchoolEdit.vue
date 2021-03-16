@@ -10,8 +10,10 @@
             :disabled="!edit"
             :clearable="edit"
             clear-icon="fa-times"
-            @input="$v.name.$touch()"
+            @input="$v.school.name.$touch()"
+            @blur="$v.school.name.$touch()"
             light
+            :error-messages="nameErrors">
           ></v-text-field>
         </v-col>
 
@@ -23,7 +25,8 @@
             :disabled="!edit"
             :clearable="edit"
             clear-icon="fa-times"
-            @input="$v.phone.$touch()"
+            @input="$v.school.phone.$touch()"
+            @blur="$v.school.phone.$touch()"
             light
           ></v-text-field>
         </v-col>
@@ -35,7 +38,8 @@
             :readonly="!edit"
             :disabled="!edit"
             clear-icon="fa-times"
-            @input="$v.email.$touch()"
+            @input="$v.school.email.$touch()"
+            @blur="$v.school.email.$touch()"
             light
           ></v-text-field>
         </v-col>
@@ -89,10 +93,6 @@ export default {
     inputSchool: {
       type: Object,
       required: true,
-    },
-    inputAddress: {
-      type: Object,
-      required: true,
     }
   },
   data: () => ({
@@ -119,21 +119,22 @@ export default {
       }
     },
     validations: {
-      name:  { required, minLength: minLength(3) },
-      shortName:   { required, minLength: minLength(3) },
-      email:      { email },
-      phone: {
-        required,
-        phoneFormat(val) {
-          return this.phonePattern.test(val); }
+      school: {
+        name:  { required, minLength: minLength(3) },
+        shortName:   { required, minLength: minLength(3) },
+        email:      { email },
+        phone: {
+          required,
+          phoneFormat(val) {
+            return this.phonePattern.test(val); }
+        }
       }
     },
   }),
   methods: {
     async saveSchool() {
       await this.$store.dispatch("updateSchool", this.school);
-      this.school = await this.$emit('refreshSchool', this.school.id);
-      //this.$emit('refreshSchool');
+      this.$emit('refreshSchool');
     },
     updateStyle() {
       document
@@ -143,31 +144,31 @@ export default {
   },
   mounted() {
     this.updateStyle();
-    this.school = Object.assign({}, this.inputSchool);
+    this.school = {...this.inputSchool};
+        //await this.getSchoolData(this.inputSchool.id);
     delete this.school.companyId;
-    this.address = Object.assign({}, this.inputAddress);
     console.log("Это вывод с редактора");
     console.log(this.school);
-    console.log(this.address);
+
   },
+  computed: {
+    nameErrors() {
+      return this.vuelidateNameErrors('school.name');
+    }
+
+  },
+
   watch: {
     inputSchool: {
       deep: true,
       immediate: true,
       handler: function(value) {
-        this.fillComponentFields(value);
-      }
-    },
-    inputAddress: {
-      deep: true,
-      immediate: true,
-      handler: function(value) {
-        this.fillComponentFields(value);
+        this.school = {...value};
       }
     }
   },
   updated() {
     this.updateStyle();
-  },
+  }
 };
 </script>
