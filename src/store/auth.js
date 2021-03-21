@@ -1,8 +1,9 @@
-import axios from "axios";
 import store from '@/store'
 import router from "@/router";
-const authUrl = 'http://localhost:8080/auth/';
+import axios from "axios";
 
+const authUrl = 'http://localhost:8080/auth/';
+const instance = axios.create({withCredentials : true})
 //https://webdevblog.ru/autentifikacii-v-vue-s-ispolzovaniem-vuex/
 export default {
     state: {
@@ -13,7 +14,7 @@ export default {
     actions: {
         async login ({commit, dispatch}, {username, password}) {
             commit('auth_request');
-            return await axios.post(authUrl + 'login', {}, {
+            return await instance.post(authUrl + 'login', {}, {
                 auth: {username, password}
             }).then(async (response) => {
                     const token = response.headers['x-csrf-token'];
@@ -27,7 +28,7 @@ export default {
             },
         async logout({commit}) {
             commit('logout');
-            await axios.post(authUrl + 'logout', {})
+            await instance.post(authUrl + 'logout', {})
                 .finally(() => {
                     localStorage.removeItem('token');
                     localStorage.removeItem('auth_user');
@@ -47,7 +48,7 @@ export default {
         },
         refreshAuthUser({dispatch}) { //обновляем localStorage
             return new Promise(((resolve, reject) => {
-                axios.get(authUrl + 'user', {})
+                instance.get(authUrl + 'user', {})
                     .then((response) => {
                         const token = response.headers['x-csrf-token'];
                         const user = response.data;
@@ -71,13 +72,11 @@ export default {
         successProcess({commit}, {user, token}) {
             localStorage.setItem('auth_user', JSON.stringify(user));
             localStorage.setItem('token', token);
-            axios.defaults.headers.common['x-csrf-token'] = token;
             commit('auth_success', {token, user});
         },
         errorProcess({commit}, error) {
             console.log(error)
             localStorage.removeItem('token');
-            delete axios.defaults.headers.common['x-csrf-token'];
             commit('auth_error');
         }
     },

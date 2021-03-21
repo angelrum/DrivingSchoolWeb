@@ -72,9 +72,9 @@
             v-model="company.website"></v-text-field>
       </v-col>
     </v-row>
-    <Address v-if="!isNull(company.addressLegal)" :address="company.addressLegal"
+    <Address v-if="!isNull(company.addressLegal)" :in-address="company.addressLegal"
              :title="$tc('address.legal')" :edit="edit"/>
-    <Address v-if="!isNull(company.addressActual) && !equalAddress" :address="company.addressActual"
+    <Address v-if="!isNull(company.addressActual) && !equalAddress" :in-address="company.addressActual"
              :title="$tc('address.actual')" :edit="edit"/>
     <label class="custom-control custom-checkbox">
       <input v-model="equalAddress" type="checkbox" role="checkbox" :disabled="!edit" class="custom-control-input">
