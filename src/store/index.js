@@ -4,6 +4,7 @@ import user from "@/store/user";
 import school from "@/store/school";
 import auth from "@/store/auth";
 import company from "@/store/company";
+import dadata from "@/store/dadata";
 
 Vue.use(Vuex)
 
@@ -40,6 +41,6 @@ export default new Vuex.Store({
     info: n => n.information
   },
   modules: {
-    user, auth, company, school
+    user, auth, company, school, dadata
   }
 })

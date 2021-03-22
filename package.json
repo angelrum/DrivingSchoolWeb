@@ -13,6 +13,7 @@
     "register-service-worker": "^1.7.1",
     "vue": "^2.6.11",
     "vue-axios": "^2.1.5",
+    "vue-dadata": "^1.4.10",
     "vue-i18n": "^8.22.2",
     "vue-router": "^3.2.0",
     "vuejs-noty": "^0.1.3",
