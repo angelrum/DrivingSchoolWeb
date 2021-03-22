@@ -44,8 +44,6 @@
             clear-icon="fa-times"
             v-model="inAddress.office"
             :label="$t('office')"
-            @input="$v.inAddress.office.$touch()"
-            @blur="$v.inAddress.office.$touch()"
             :error-messages="officeErrors">
         </v-text-field>
       </v-col>
@@ -114,15 +112,16 @@ export default {
   watch: {
     searchAddress(val) {
       this.loading = true;
+      const clarification = this.addresses.includes(val); //уточнение адреса
       if (!this.isNull(val) && val.length >= 2
-          && (!this.addresses.includes(val) || this.addresses.length!==1) ) {
+          && (!clarification || this.addresses.length!==1) ) {
         this.addresses.length = 0;
         this.$store.dispatch('fetchSuggestions', val).then(response => {
               const suggestions = !this.isNull(response.data.suggestions) ? response.data.suggestions : null;
               if (!this.isNull(suggestions)) {
                 suggestions.forEach(el => {
                   this.addresses.push(el.value);
-                  if (el.value === val) this.saveAddress(el.data);
+                  if (el.value === val || clarification) this.saveAddress(el.data);
                 });
               }
         })

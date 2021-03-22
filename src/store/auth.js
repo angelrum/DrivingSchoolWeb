@@ -87,7 +87,7 @@ export default {
         auth_success(state, {token, user}) {
             state.status = 'success';
             state.token = token;
-            // state.user = user;
+            state.user = JSON.stringify(user);
         },
         auth_error(state) {
             state.status = 'error';
@@ -102,7 +102,7 @@ export default {
         authStatus: state => state.status,
         isAdmin: state => {
             let user = JSON.parse(state.user);
-            return user.roles.includes('ADMIN');
+            return user.hasOwnProperty('roles') ? user.roles.includes('ADMIN') : false;
         },
         authUser: state => {
             let user = state.user;
