@@ -65,7 +65,6 @@ export default {
       await this.$store
           .dispatch("getAuthUser")
           .then(async (authUser) => {
-
             schools = await this.$store.dispatch("fetchAllSchool");
           })
           .finally(() => setTimeout(() => (this.loadingSchools = false), 500));

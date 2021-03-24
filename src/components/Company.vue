@@ -172,6 +172,7 @@ export default {
         return
       }
       const al = this.company.addressLegal;
+      console.log(this.company);
       const aa = this.company.addressActual;
       if (this.equalAddress) { //адреса равны
         this.company.addressLegal = aa;

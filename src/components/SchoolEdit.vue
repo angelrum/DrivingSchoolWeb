@@ -45,7 +45,7 @@
         </v-col>
       </v-row>
 
-      <Address v-if="!isNull(school.address)" :edit="edit" :address="school.address" />
+      <Address v-if="!isNull(school.address)" :edit="edit" :in-address="school.address" />
 
     </v-container>
 
@@ -111,20 +111,20 @@ export default {
         street: "",
         floor: ""
       }
-    },
-    validations: {
-      school: {
-        name:  { required, minLength: minLength(3) },
-        shortName:   { required, minLength: minLength(3) },
-        email:      { email },
-        phone: {
-          required,
-          phoneFormat(val) {
-            return this.phonePattern.test(val); }
-        }
-      }
-    },
+    }
   }),
+  validations: {
+    school: {
+      name:  { required, minLength: minLength(3) },
+      shortName:   { required, minLength: minLength(3) },
+      email:      { email },
+      phone: {
+        required,
+        phoneFormat(val) {
+          return this.phonePattern.test(val); }
+      }
+    }
+  },
   methods: {
     async saveSchool() {
       await this.$store.dispatch("updateSchool", this.school);
@@ -147,6 +147,7 @@ export default {
   },
   computed: {
     nameErrors() {
+      console.log(this.$v);
       return this.vuelidateNameErrors('school.name');
     }
 
