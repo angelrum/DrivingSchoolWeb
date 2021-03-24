@@ -107,15 +107,9 @@ export default {
       phone: "",
       email: "",
       address: {
-        id: "",
-        country: "",
-        region: "",
         city: "",
-        zip: "",
         street: "",
-        home: "",
-        floor: "",
-        office: ""
+        floor: ""
       }
     },
     validations: {
